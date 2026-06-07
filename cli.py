@@ -2,7 +2,7 @@
 funding calls.
 
 Usage:
-    python main.py [URL]
+    python cli.py [URL]
 
 If no URL is given, defaults to the GING site.
 """
