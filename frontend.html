@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Research Funding Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-base:       #0f172a;
+      --bg-surface:    #1e293b;
+      --bg-elevated:   #273347;
+      --bg-hover:      #2d3f59;
+      --border:        rgba(148,163,184,.12);
+      --border-strong: rgba(148,163,184,.22);
+      --text-primary:  #f1f5f9;
+      --text-secondary:#94a3b8;
+      --text-muted:    #64748b;
+      --accent-cyan:   #06b6d4;
+      --accent-violet: #7c3aed;
+      --accent-glow:   rgba(6,182,212,.18);
+      --green:         #10b981;
+      --amber:         #f59e0b;
+      --red:           #ef4444;
+      --radius:        8px;
+      --radius-lg:     12px;
+      --radius-xl:     16px;
+      --shadow-sm:     0 1px 3px rgba(0,0,0,.4);
+      --shadow-md:     0 4px 16px rgba(0,0,0,.5);
+      --shadow-lg:     0 12px 40px rgba(0,0,0,.6);
+      --transition:    all .25s cubic-bezier(.4,0,.2,1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
+
+    /* ── LAYOUT ── */
+    .app-shell { display: flex; flex-direction: column; min-height: 100vh; }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,23,42,.85);
+      backdrop-filter: blur(16px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: .95rem; letter-spacing: -.01em;
+      color: var(--text-primary); text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .topbar-right { display: flex; align-items: center; gap: 8px; }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+
+    .status-label { font-size: .8rem; color: var(--text-muted); font-weight: 500; }
+
+    .main-content {
+      flex: 1;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+      width: 100%;
+    }
+
+    /* ── HERO ── */
+    .hero { text-align: center; margin-bottom: 48px; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(6,182,212,.1);
+      border: 1px solid rgba(6,182,212,.3);
+      color: var(--accent-cyan);
+      font-size: .75rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+      padding: 4px 12px; border-radius: 99px; margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800; letter-spacing: -.03em; line-height: 1.1;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 12px;
+    }
+
+    .hero p { font-size: 1rem; color: var(--text-secondary); max-width: 480px; margin: 0 auto; }
+
+    /* ── SEARCH BOX ── */
+    .search-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-xl);
+      padding: 24px; margin-bottom: 32px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .search-label {
+      font-size: .8rem; font-weight: 600; color: var(--text-muted);
+      letter-spacing: .05em; text-transform: uppercase;
+      margin-bottom: 10px; display: block;
+    }
+
+    .search-row { display: flex; gap: 10px; align-items: stretch; }
+
+    .search-input-wrap { flex: 1; position: relative; }
+
+    .search-input-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); pointer-events: none;
+      display: flex; align-items: center;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-base);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-family: inherit; font-size: .95rem;
+      padding: 12px 14px 12px 40px;
+      outline: none; transition: var(--transition);
+    }
+
+    .search-input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .search-input::placeholder { color: var(--text-muted); }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+      color: white; border: none;
+      border-radius: var(--radius);
+      font-family: inherit; font-size: .9rem; font-weight: 600;
+      padding: 12px 22px; cursor: pointer;
+      transition: var(--transition); white-space: nowrap;
+      position: relative; overflow: hidden;
+    }
+
+    .btn-primary::after { content: ''; position: absolute; inset: 0; background: white; opacity: 0; transition: opacity .2s; }
+    .btn-primary:hover::after { opacity: .08; }
+    .btn-primary:active { transform: scale(.98); }
+    .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-primary:disabled:hover::after { opacity: 0; }
+
+    /* ── SPINNER ── */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.25);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── SKELETON ── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-surface) 25%, var(--bg-elevated) 50%, var(--bg-surface) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: var(--radius);
+    }
+
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    .skeleton-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px; margin-bottom: 12px;
+    }
+
+    /* ── TOAST ── */
+    .toast-container {
+      position: fixed; top: 68px; right: 20px;
+      z-index: 999;
+      display: flex; flex-direction: column; gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      min-width: 280px; max-width: 380px;
+      box-shadow: var(--shadow-lg);
+      pointer-events: all;
+      animation: toastIn .3s cubic-bezier(.4,0,.2,1) forwards;
+    }
+
+    .toast.exit { animation: toastOut .25s ease forwards; }
+
+    @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(20px); } }
+
+    .toast-icon { flex-shrink: 0; }
+    .toast-msg { font-size: .875rem; color: var(--text-primary); flex: 1; }
+    .toast-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 2px; border-radius: 4px; flex-shrink: 0; transition: color .15s; }
+    .toast-close:hover { color: var(--text-primary); }
+
+    /* ── SECTION LABELS ── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: .8rem; font-weight: 700;
+      color: var(--text-muted); letter-spacing: .07em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .section-pill {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: .7rem; font-weight: 600; color: var(--text-secondary);
+      padding: 2px 8px;
+    }
+
+    /* ── PROFILE CARD ── */
+    .profile-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-xl);
+      overflow: hidden; margin-bottom: 32px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .profile-topbar {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; user-select: none; transition: background .2s;
+    }
+
+    .profile-topbar:hover { background: var(--bg-elevated); }
+
+    .profile-ident { display: flex; align-items: center; gap: 14px; }
+
+    .profile-avatar {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1rem; color: white; flex-shrink: 0;
+    }
+
+    .profile-name { font-size: 1rem; font-weight: 600; color: var(--text-primary); }
+    .profile-institution { font-size: .8rem; color: var(--text-secondary); margin-top: 1px; }
+
+    .profile-body { display: none; }
+    .profile-body.open { display: block; animation: fadeSlide .25s ease; }
+
+    @keyframes fadeSlide { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0; border-bottom: 1px solid var(--border);
+    }
+
+    .meta-cell { padding: 16px 24px; border-right: 1px solid var(--border); }
+    .meta-cell:last-child { border-right: none; }
+
+    .meta-key { font-size: .7rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
+    .meta-val { font-size: .875rem; font-weight: 500; color: var(--text-primary); }
+
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 99px; font-size: .75rem; font-weight: 600; }
+    .badge-cyan   { background: rgba(6,182,212,.15);  color: var(--accent-cyan); border: 1px solid rgba(6,182,212,.3); }
+    .badge-violet { background: rgba(124,58,237,.15); color: #a78bfa;            border: 1px solid rgba(124,58,237,.3); }
+    .badge-green  { background: rgba(16,185,129,.15); color: var(--green);       border: 1px solid rgba(16,185,129,.3); }
+    .badge-amber  { background: rgba(245,158,11,.15); color: var(--amber);       border: 1px solid rgba(245,158,11,.3); }
+    .badge-slate  { background: rgba(100,116,139,.15);color: #94a3b8;            border: 1px solid rgba(100,116,139,.3); }
+
+    .profile-section { padding: 20px 24px; border-bottom: 1px solid var(--border); }
+    .profile-section:last-child { border-bottom: none; }
+
+    .ps-title { font-size: .72rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+    .tags-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .tag { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 6px; font-size: .78rem; font-weight: 500; color: var(--text-secondary); padding: 4px 10px; }
+
+    .research-line-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .research-line-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .rl-dot { width: 6px; height: 6px; background: var(--accent-cyan); border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
+    .rl-name { font-size: .875rem; font-weight: 600; color: var(--text-primary); }
+    .rl-desc { font-size: .8rem; color: var(--text-secondary); margin-top: 2px; line-height: 1.5; }
+    .rl-kw   { font-size: .75rem; color: var(--text-muted); margin-top: 4px; font-family: 'SF Mono', 'Fira Code', monospace; }
+
+    /* ── OPPORTUNITY CARDS ── */
+    .opps-grid { display: flex; flex-direction: column; gap: 10px; }
+
+    .opp-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid #475569;   /* overridden inline by sector_match color */
+      border-radius: var(--radius-lg);
+      padding: 18px 20px 16px 18px;
+      transition: box-shadow 200ms ease, transform 200ms ease;
+      box-shadow: var(--shadow-sm);
+      cursor: default;
+    }
+
+    .opp-card:hover {
+      box-shadow: 0 8px 30px rgba(0,0,0,.6);
+      transform: translateY(-2px);
+    }
+
+    /* ── CARD HEADER: rank + ID + score ring ── */
+    .oc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .oc-id-block { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+
+    .oc-rank {
+      font-size: .65rem; font-weight: 700;
+      color: var(--text-muted); letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .oc-id {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: .83rem; font-weight: 700;
+      color: var(--accent-cyan);
+      letter-spacing: .01em; line-height: 1.25;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ── SCORE RING ── */
+    .score-ring-bg   { fill: none; stroke: var(--bg-elevated); stroke-width: 3.5; }
+    .score-ring-fill { fill: none; stroke-width: 3.5; stroke-linecap: round; transition: stroke-dasharray .8s cubic-bezier(.4,0,.2,1); }
+    .score-num {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .6rem; font-weight: 800; color: var(--text-primary);
+    }
+
+    /* ── CARD TITLE ── */
+    .oc-title {
+      font-size: .95rem; font-weight: 600;
+      color: var(--text-primary); line-height: 1.5;
+      margin-bottom: 14px;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    /* ── CARD FOOTER BADGES ── */
+    .oc-footer { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+    .oc-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .72rem; font-weight: 600;
+      padding: 3px 9px; border-radius: 5px;
+    }
+
+    .oc-badge-open     { background: rgba(16,185,129,.12); color: var(--green);      border: 1px solid rgba(16,185,129,.28); }
+    .oc-badge-upcoming { background: rgba(245,158,11,.12); color: var(--amber);      border: 1px solid rgba(245,158,11,.28); }
+    .oc-badge-deadline { background: var(--bg-elevated);  color: var(--text-muted); border: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+
+    .oc-match-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: .68rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 5px;
+      letter-spacing: .04em; text-transform: uppercase;
+    }
+    .oc-match-primary   { background: rgba(16,185,129,.12); color: var(--green);      border: 1px solid rgba(16,185,129,.3); }
+    .oc-match-secondary { background: rgba(245,158,11,.12); color: var(--amber);      border: 1px solid rgba(245,158,11,.3); }
+    .oc-match-none      { background: rgba(100,116,139,.08);color: var(--text-muted); border: 1px solid var(--border); }
+
+    /* chip kept for Full List view */
+    .chip { display: inline-flex; align-items: center; gap: 4px; font-size: .75rem; font-weight: 600; padding: 3px 8px; border-radius: 5px; }
+    .chip-open      { background: rgba(16,185,129,.1); color: var(--green); border: 1px solid rgba(16,185,129,.2); }
+    .chip-upcoming  { background: rgba(245,158,11,.1); color: var(--amber); border: 1px solid rgba(245,158,11,.2); }
+
+    /* ── OPP DETAIL PANEL ── */
+    .panel-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(4px);
+      animation: panelFadeIn 200ms ease forwards;
+    }
+
+    @keyframes panelFadeIn  { from { opacity: 0; }              to { opacity: 1; }              }
+    @keyframes panelSlideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    @keyframes panelFadeOut { from { opacity: 1; }              to { opacity: 0; }              }
+
+    .opp-panel {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 450px; max-width: 100vw;
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-strong);
+      z-index: 201;
+      display: flex; flex-direction: column;
+      animation: panelSlideIn 300ms cubic-bezier(.4,0,.2,1) forwards;
+      box-shadow: -16px 0 56px rgba(0,0,0,.65);
+    }
+
+    /* topbar: close btn left · score ring right */
+    .panel-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 24px 14px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .panel-close {
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-muted); cursor: pointer;
+      transition: var(--transition); flex-shrink: 0;
+    }
+    .panel-close:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-strong); }
+
+    /* hero: colored left strip + ID + title */
+    .panel-hero {
+      padding: 18px 24px 16px 20px;
+      border-left: 4px solid #475569;   /* overridden inline */
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .panel-id {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: .82rem; font-weight: 700;
+      color: var(--accent-cyan); letter-spacing: .01em;
+      margin-bottom: 8px; word-break: break-all;
+    }
+
+    .panel-title {
+      font-size: 1.05rem; font-weight: 700;
+      color: var(--text-primary); line-height: 1.45;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    /* badge row */
+    .panel-badges {
+      display: flex; flex-wrap: wrap; gap: 7px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .panel-sector-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .72rem; font-weight: 600;
+      padding: 3px 9px; border-radius: 5px;
+      border: 1px solid;
+    }
+
+    /* quick info table */
+    .panel-info {
+      flex: 1;
+      padding: 6px 24px 0;
+      display: flex; flex-direction: column;
+      overflow: hidden;   /* never scrolls */
+    }
+
+    .panel-info-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-info-row:last-child { border-bottom: none; }
+
+    .panel-info-icon { color: var(--text-muted); display: flex; align-items: center; flex-shrink: 0; }
+    .panel-info-key {
+      font-size: .68rem; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em;
+      min-width: 88px; flex-shrink: 0;
+    }
+    .panel-info-val  { font-size: .875rem; font-weight: 500; color: var(--text-primary); flex: 1; min-width: 0; }
+    .panel-info-mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: .75rem; word-break: break-all; color: var(--text-secondary); }
+
+    .panel-topics { display: flex; flex-wrap: wrap; gap: 5px; }
+    .panel-topic-tag {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: 4px; font-size: .72rem; font-weight: 500;
+      color: var(--text-secondary); padding: 2px 7px;
+    }
+
+    /* footer: fixed at bottom */
+    .panel-footer {
+      padding: 14px 24px 18px;
+      border-top: 1px solid var(--border-strong);
+      display: flex; gap: 10px; flex-shrink: 0;
+      background: var(--bg-surface);
+    }
+
+    .panel-btn-primary {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+      color: white; border: none; border-radius: var(--radius);
+      font-family: inherit; font-size: .875rem; font-weight: 600;
+      padding: 11px 16px; cursor: pointer; transition: var(--transition);
+    }
+    .panel-btn-primary:hover:not(:disabled) { opacity: .85; }
+    .panel-btn-primary:disabled { opacity: .32; cursor: not-allowed; }
+
+    .panel-btn-close {
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      background: transparent; color: var(--text-secondary);
+      border: 1px solid var(--border-strong); border-radius: var(--radius);
+      font-family: inherit; font-size: .875rem; font-weight: 600;
+      padding: 11px 16px; cursor: pointer; transition: var(--transition);
+    }
+    .panel-btn-close:hover { background: var(--bg-elevated); color: var(--text-primary); }
+
+    @media (max-width: 600px) {
+      .opp-panel { width: 100vw; border-left: none; }
+    }
+
+    /* ── DETAIL GRID (2 × 2) ── */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);        /* 1px gaps = grid lines */
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      flex-shrink: 0;
+      margin: 0 24px;
+    }
+
+    .detail-cell {
+      background: var(--bg-surface);
+      padding: 11px 14px;
+    }
+
+    .detail-cell-label {
+      font-size: .62rem; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: .07em;
+      margin-bottom: 4px;
+    }
+
+    .detail-cell-value {
+      font-size: .85rem; font-weight: 600;
+      color: var(--text-primary); line-height: 1.35;
+    }
+
+    .detail-cell-sub {
+      font-size: .72rem; color: var(--text-muted);
+      margin-top: 2px; font-weight: 400;
+    }
+
+    .detail-type-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      background: rgba(124,58,237,.12); color: #a78bfa;
+      border: 1px solid rgba(124,58,237,.25);
+      font-size: .68rem; font-weight: 700; letter-spacing: .03em;
+      padding: 2px 7px; border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    /* ── SCOPE PREVIEW ── */
+    .scope-section {
+      flex-shrink: 0;
+      margin: 0 24px;
+      padding: 11px 14px;
+      background: rgba(148,163,184,.05);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .scope-label {
+      font-size: .62rem; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: .07em;
+      margin-bottom: 5px;
+    }
+
+    .scope-text {
+      font-size: .8rem; color: var(--text-secondary);
+      font-style: italic; line-height: 1.5;
+      display: -webkit-box; -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical; overflow: hidden;
+      word-break: break-word;
+    }
+
+    /* spacer between sections */
+    .panel-gap { height: 10px; flex-shrink: 0; }
+
+    /* ── DETAIL PAGE ── */
+    .detail-page {
+      position: fixed; inset: 0;
+      background: var(--bg-base);
+      z-index: 2000;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+
+    .detail-header {
+      padding: 14px 32px;
+      background: rgba(15,23,42,.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-strong);
+      display: flex; align-items: center; gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .detail-footer {
+      padding: 14px 32px;
+      background: rgba(15,23,42,.92);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border-strong);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .detail-back-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      color: var(--text-secondary);
+      font-family: inherit; font-size: .875rem; font-weight: 600;
+      padding: 8px 16px; cursor: pointer;
+      transition: var(--transition);
+    }
+    .detail-back-btn:hover { background: var(--bg-elevated); color: var(--text-primary); }
+
+    .detail-header-id {
+      font-family: 'SF Mono','Fira Code','Consolas',monospace;
+      font-size: .72rem; color: var(--text-muted);
+      margin-left: auto; white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; max-width: 340px;
+    }
+
+    .detail-footer-score {
+      font-size: .78rem; color: var(--text-muted); font-weight: 500;
+    }
+
+    /* scrollable body */
+    .detail-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 44px 48px 48px;
+    }
+
+    /* hero */
+    .detail-hero {
+      border-left: 4px solid #475569;   /* overridden inline */
+      padding-left: 20px;
+      margin-bottom: 36px;
+    }
+
+    .detail-id {
+      font-family: 'SF Mono','Fira Code','Consolas',monospace;
+      font-size: 1rem; font-weight: 700;
+      color: var(--accent-cyan); letter-spacing: .01em;
+      margin-bottom: 12px; word-break: break-all;
+    }
+
+    .detail-title {
+      font-size: 1.55rem; font-weight: 800;
+      color: var(--text-primary); line-height: 1.3;
+      margin-bottom: 20px; letter-spacing: -.025em;
+    }
+
+    .detail-score-row {
+      display: flex; align-items: center;
+      flex-wrap: wrap; gap: 10px;
+    }
+
+    /* info grid */
+    .detail-section { margin-bottom: 36px; }
+
+    .detail-section-title {
+      font-size: .68rem; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: .09em;
+      padding-bottom: 10px; margin-bottom: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-top: 1px;    /* sits flush under section-title border */
+    }
+
+    .detail-info-cell {
+      background: var(--bg-surface);
+      padding: 18px 20px;
+    }
+
+    .detail-info-lbl {
+      font-size: .65rem; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: .07em;
+      margin-bottom: 7px;
+    }
+
+    .detail-info-val {
+      font-size: .95rem; font-weight: 600;
+      color: var(--text-primary); line-height: 1.4;
+    }
+
+    .detail-info-sub {
+      font-size: .78rem; color: var(--text-muted);
+      margin-top: 4px; font-weight: 400; line-height: 1.3;
+    }
+
+    /* full scope */
+    .detail-scope-text {
+      font-size: .88rem; color: var(--text-secondary);
+      line-height: 1.8; word-break: break-word;
+      white-space: pre-wrap;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-top: 1px;
+    }
+
+    /* portal banner + button */
+    .detail-portal-banner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px;
+      background: linear-gradient(135deg, rgba(6,182,212,.08), rgba(124,58,237,.08));
+      border: 1px solid rgba(6,182,212,.25);
+      border-radius: var(--radius-lg);
+      padding: 14px 20px;
+      margin-bottom: 20px;
+    }
+
+    .detail-portal-text {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .8rem; font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .detail-portal-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+      color: white; text-decoration: none;
+      border: none; border-radius: var(--radius);
+      font-family: inherit; font-size: .875rem; font-weight: 600;
+      padding: 9px 18px; cursor: pointer;
+      transition: var(--transition); white-space: nowrap; flex-shrink: 0;
+    }
+    .detail-portal-btn:hover { opacity: .85; transform: translateY(-1px); }
+
+    .detail-portal-btn-sm {
+      font-size: .78rem; padding: 7px 13px;
+    }
+
+    @media (max-width: 768px) {
+      .detail-content { padding: 24px 16px 32px; }
+      .detail-header, .detail-footer { padding: 12px 16px; }
+      .detail-title { font-size: 1.2rem; }
+      .detail-id { font-size: .85rem; }
+      .detail-info-grid { grid-template-columns: 1fr; }
+      .detail-header-id { display: none; }
+      .detail-portal-banner { flex-direction: column; align-items: flex-start; }
+      .detail-portal-btn { width: 100%; justify-content: center; }
+    }
+
+    /* ── EMPTY / PLACEHOLDER ── */
+    .empty-state { text-align: center; padding: 80px 24px; }
+    .empty-icon { width: 64px; height: 64px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--text-muted); }
+    .empty-state h3 { font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+    .empty-state p  { font-size: .875rem; color: var(--text-muted); }
+
+    /* ── FOOTER ── */
+    .footer { border-top: 1px solid var(--border); padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: var(--bg-base); }
+    .footer-left { font-size: .8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .footer-right { display: flex; align-items: center; gap: 20px; }
+    .footer-link  { font-size: .8rem; color: var(--text-muted); text-decoration: none; transition: color .2s; }
+    .footer-link:hover { color: var(--accent-cyan); }
+
+    /* ── TABS ── */
+    .tabs-bar {
+      display: flex; gap: 2px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 4px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+      font-family: inherit; font-size: .82rem; font-weight: 600;
+      color: var(--text-muted);
+      background: transparent;
+      border: none; border-radius: var(--radius);
+      padding: 9px 12px; cursor: pointer;
+      transition: var(--transition); white-space: nowrap;
+    }
+
+    .tab-btn:hover { color: var(--text-secondary); background: var(--bg-elevated); }
+
+    .tab-btn.active {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tab-btn .tab-count {
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: .68rem; font-weight: 700;
+      padding: 1px 7px;
+      color: var(--text-muted);
+    }
+
+    .tab-btn.active .tab-count {
+      background: rgba(6,182,212,.15);
+      border-color: rgba(6,182,212,.3);
+      color: var(--accent-cyan);
+    }
+
+    /* ── BY SECTOR VIEW ── */
+    .sector-group { margin-bottom: 24px; }
+
+    .sector-group-hdr {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 14px 8px 12px;
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+    }
+
+    .sector-hdr-rule {
+      height: 3px; border-radius: 2px; flex-shrink: 0; width: 3px;
+      align-self: stretch;
+    }
+
+    .sector-hdr-label {
+      font-size: .72rem; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    .sector-hdr-sublabel {
+      font-size: .75rem; color: var(--text-secondary); font-weight: 500;
+    }
+
+    .sector-hdr-count {
+      margin-left: auto;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: .68rem; font-weight: 600; color: var(--text-muted);
+      padding: 1px 8px;
+    }
+
+    .sector-empty {
+      padding: 16px 20px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      font-size: .8rem; color: var(--text-muted);
+    }
+
+    /* ── FULL LIST VIEW ── */
+    .full-search-wrap { position: relative; margin-bottom: 10px; }
+
+    .full-search-icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); pointer-events: none; display: flex; align-items: center;
+    }
+
+    .full-search-input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-family: inherit; font-size: .875rem;
+      padding: 10px 14px 10px 38px;
+      outline: none; transition: var(--transition);
+    }
+
+    .full-search-input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .full-search-input::placeholder { color: var(--text-muted); }
+
+    .full-list-meta { font-size: .72rem; color: var(--text-muted); margin-bottom: 12px; }
+
+    .full-list {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--bg-surface);
+    }
+
+    .full-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 16px;
+      border-bottom: 1px solid var(--border);
+      transition: background .12s;
+    }
+
+    .full-row:last-child { border-bottom: none; }
+    .full-row:hover { background: var(--bg-elevated); }
+
+    .full-rank { font-size: .68rem; font-weight: 700; color: var(--text-muted); width: 28px; text-align: right; flex-shrink: 0; }
+
+    .full-score { font-size: .72rem; font-weight: 700; width: 40px; text-align: center; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+
+    .full-match-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+    .full-title { flex: 1; min-width: 0; font-size: .82rem; font-weight: 500; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .full-meta { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
+    .full-deadline { font-size: .7rem; color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+    .full-chip {
+      font-size: .65rem; font-weight: 600;
+      padding: 2px 6px; border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .topbar { padding: 0 16px; }
+      .main-content { padding: 32px 16px 60px; }
+      .oc-title { font-size: .875rem; }
+      .oc-id   { font-size: .75rem; }
+      .search-row { flex-direction: column; }
+      .profile-grid { grid-template-columns: repeat(2,1fr); }
+      .meta-cell { border-right: none; border-bottom: 1px solid var(--border); }
+      .footer { flex-direction: column; align-items: flex-start; }
+      .tab-btn span { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .profile-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+/* API base URL — override via ?api=https://... or window.API_BASE env injection */
+const API_BASE = (() => {
+  const p = new URLSearchParams(window.location.search).get('api');
+  return (p || window.API_BASE || 'http://localhost:8000').replace(/\/$/, '');
+})();
+
+/* ─── SVG ICONS ─────────────────────────────────────────────────── */
+const Icon = ({ name, size = 16, className = '', style = {} }) => {
+  const paths = {
+    zap:         <><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></>,
+    search:      <><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></>,
+    chevronDown:  <><polyline points="6 9 12 15 18 9"/></>,
+    chevronLeft:  <><polyline points="15 18 9 12 15 6"/></>,
+    x:           <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
+    check:       <><polyline points="20 6 9 17 4 12"/></>,
+    alertCircle: <><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></>,
+    calendar:    <><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></>,
+    hash:        <><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></>,
+    externalLink:<><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></>,
+    eye:         <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>,
+    eyeOff:      <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></>,
+    building:    <><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22V12h6v10"/><path d="M8 7h.01"/><path d="M16 7h.01"/><path d="M8 11h.01"/><path d="M16 11h.01"/></>,
+    layers:      <><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></>,
+    cpu:         <><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></>,
+    target:      <><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>,
+    award:       <><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></>,
+    bookOpen:    <><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></>,
+    globe:       <><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></>,
+    trendingUp:  <><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></>,
+    list:        <><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></>,
+    pieChart:    <><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></>,
+  };
+
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size} height={size}
+      viewBox="0 0 24 24"
+      fill="none" stroke="currentColor"
+      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} style={style} aria-hidden="true"
+    >
+      {paths[name] || null}
+    </svg>
+  );
+};
+
+/* ─── SECTOR CONFIG ─────────────────────────────────────────────── */
+const SECTORS = {
+  DIGITAL_TECH:          { icon: 'cpu',        label: 'Digital Tech',   color: '#06b6d4' },
+  HEALTH_BIOMEDICAL:     { icon: 'award',       label: 'Health & Bio',   color: '#10b981' },
+  MOBILITY_TRANSPORT:    { icon: 'globe',       label: 'Mobility',       color: '#3b82f6' },
+  ENERGY_CLIMATE:        { icon: 'zap',         label: 'Energy',         color: '#f59e0b' },
+  ROBOTICS_AUTOMATION:   { icon: 'cpu',         label: 'Robotics',       color: '#8b5cf6' },
+  MANUFACTURING_INDUSTRY:{ icon: 'layers',      label: 'Manufacturing',  color: '#ec4899' },
+  SECURITY_DEFENCE:      { icon: 'eye',         label: 'Security',       color: '#ef4444' },
+  EDUCATION_LEARNING:    { icon: 'bookOpen',    label: 'Education',      color: '#06b6d4' },
+  AGRICULTURE_FOOD:      { icon: 'trendingUp',  label: 'Agriculture',    color: '#84cc16' },
+  MATERIALS_ADVANCED:    { icon: 'layers',      label: 'Materials',      color: '#a78bfa' },
+};
+
+/* ─── TOAST ─────────────────────────────────────────────────────── */
+let toastId = 0;
+
+function ToastContainer({ toasts, remove }) {
+  return (
+    <div className="toast-container" aria-live="polite">
+      {toasts.map(t => (
+        <div key={t.id} className={`toast ${t.exit ? 'exit' : ''}`} role="alert">
+          <span className="toast-icon" style={{ color: t.color }}><Icon name={t.icon} size={16} /></span>
+          <span className="toast-msg">{t.msg}</span>
+          <button className="toast-close" onClick={() => remove(t.id)} aria-label="Cerrar"><Icon name="x" size={14} /></button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function useToasts() {
+  const [toasts, setToasts] = useState([]);
+
+  const remove = (id) => {
+    setToasts(ts => ts.map(t => t.id === id ? { ...t, exit: true } : t));
+    setTimeout(() => setToasts(ts => ts.filter(t => t.id !== id)), 300);
+  };
+
+  const add = (msg, type = 'info') => {
+    const config = {
+      success: { icon: 'check',       color: '#10b981' },
+      error:   { icon: 'alertCircle', color: '#ef4444' },
+      info:    { icon: 'zap',         color: '#06b6d4' },
+    };
+    const id = ++toastId;
+    setToasts(ts => [...ts, { id, msg, ...config[type] }]);
+    setTimeout(() => remove(id), 5000);
+    return id;
+  };
+
+  return { toasts, add, remove };
+}
+
+/* ─── SCORE RING ─────────────────────────────────────────────────── */
+function ScoreRing({ score, match, size = 44 }) {
+  const r = size / 2 - 4;
+  const circ = 2 * Math.PI * r;
+  const capped = Math.min(score, 1);
+  const dash = capped * circ;
+  const matchColor = match === 'primary' ? '#10b981' : match === 'secondary' ? '#f59e0b' : '#64748b';
+  const cx = size / 2;
+
+  return (
+    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
+      <svg
+        viewBox={`0 0 ${size} ${size}`} width={size} height={size}
+        style={{ position: 'absolute', inset: 0, transform: 'rotate(-90deg)' }}
+        aria-hidden="true"
+      >
+        <circle className="score-ring-bg" cx={cx} cy={cx} r={r} />
+        <circle
+          className="score-ring-fill"
+          cx={cx} cy={cx} r={r}
+          stroke={matchColor}
+          strokeDasharray={`${dash} ${circ}`}
+          strokeDashoffset="0"
+        />
+      </svg>
+      <div className="score-num">{score.toFixed(2)}</div>
+    </div>
+  );
+}
+
+/* ─── SKELETON LOADER ────────────────────────────────────────────── */
+function SkeletonProfile() {
+  return (
+    <div className="profile-card">
+      <div className="profile-topbar" style={{ cursor: 'default' }}>
+        <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+          <div className="skeleton" style={{ width: 40, height: 40, borderRadius: 10 }} />
+          <div>
+            <div className="skeleton" style={{ width: 220, height: 14, marginBottom: 6 }} />
+            <div className="skeleton" style={{ width: 150, height: 11 }} />
+          </div>
+        </div>
+      </div>
+      <div className="profile-grid">
+        {[1,2,3,4].map(i => (
+          <div key={i} className="meta-cell">
+            <div className="skeleton" style={{ width: 60, height: 10, marginBottom: 8 }} />
+            <div className="skeleton" style={{ width: '80%', height: 13 }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SkeletonOpps() {
+  return Array.from({ length: 3 }).map((_, i) => (
+    <div key={i} className="opp-card" style={{ marginBottom: 10, borderLeftColor: 'var(--bg-elevated)' }}>
+      {/* header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10, gap: 12 }}>
+        <div style={{ flex: 1 }}>
+          <div className="skeleton" style={{ width: 32, height: 9, marginBottom: 6, borderRadius: 3 }} />
+          <div className="skeleton" style={{ width: '60%', height: 12, borderRadius: 3 }} />
+        </div>
+        <div className="skeleton" style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0 }} />
+      </div>
+      {/* title */}
+      <div className="skeleton" style={{ width: '88%', height: 14, marginBottom: 7, borderRadius: 3 }} />
+      <div className="skeleton" style={{ width: '65%', height: 14, marginBottom: 14, borderRadius: 3 }} />
+      {/* badges */}
+      <div style={{ display: 'flex', gap: 6 }}>
+        <div className="skeleton" style={{ width: 52, height: 24, borderRadius: 5 }} />
+        <div className="skeleton" style={{ width: 80, height: 24, borderRadius: 5 }} />
+        <div className="skeleton" style={{ width: 90, height: 24, borderRadius: 5 }} />
+      </div>
+    </div>
+  ));
+}
+
+/* ─── OPPORTUNITY CARD ───────────────────────────────────────────── */
+function OppCard({ opp, rank, onClick }) {
+  const match       = opp.sector_match || 'none';
+  const borderColor = match === 'primary'   ? '#10b981'
+                    : match === 'secondary' ? '#f59e0b'
+                    : '#475569';
+  const matchLabel  = match === 'primary'   ? 'Primary'
+                    : match === 'secondary' ? 'Secondary'
+                    : 'Low Match';
+  const statusClass = opp.status === 'Abierta' ? 'oc-badge oc-badge-open' : 'oc-badge oc-badge-upcoming';
+  const statusLabel = opp.status === 'Abierta' ? 'Open' : 'Upcoming';
+
+  return (
+    <div
+      className="opp-card"
+      role="article"
+      style={{ borderLeftColor: borderColor, cursor: onClick ? 'pointer' : 'default' }}
+      onClick={onClick ? () => onClick(opp) : undefined}
+      aria-label={`#${rank} — ${opp.title}`}
+    >
+      {/* ── Header: rank + ID  ·  score ring ── */}
+      <div className="oc-header">
+        <div className="oc-id-block">
+          <span className="oc-rank">#{rank}</span>
+          <span className="oc-id" title={opp.id}>{opp.id}</span>
+        </div>
+        <ScoreRing score={opp.score} match={match} size={44} />
+      </div>
+
+      {/* ── Title ── */}
+      <div className="oc-title" title={opp.title}>{opp.title}</div>
+
+      {/* ── Footer badges ── */}
+      <div className="oc-footer">
+        <span className={statusClass}>{statusLabel}</span>
+        <span className={`oc-match-badge oc-match-${match}`}>{matchLabel}</span>
+        {opp.deadline && (
+          <span className="oc-badge oc-badge-deadline">
+            <Icon name="calendar" size={10} />{opp.deadline}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── PROFILE CARD ───────────────────────────────────────────────── */
+function ProfileCard({ profile, open, onToggle }) {
+  const initials = (profile.name || 'RG').split(' ').filter(w => /^[A-Z]/.test(w)).slice(0, 2).join('');
+  const primarySector = SECTORS[profile.primary_sector] || {};
+  const maturityBadge = { senior: 'badge-cyan', mid: 'badge-violet', junior: 'badge-slate' };
+  const typeBadge = { fundamental: 'badge-violet', applied: 'badge-green', hybrid: 'badge-amber' };
+
+  return (
+    <div className="profile-card" aria-label="Research group profile">
+      <div className="profile-topbar" onClick={onToggle} role="button" tabIndex={0}
+        onKeyDown={e => e.key === 'Enter' && onToggle()}
+        aria-expanded={open} aria-controls="profile-body">
+        <div className="profile-ident">
+          <div className="profile-avatar" aria-hidden="true">{initials || 'RG'}</div>
+          <div>
+            <div className="profile-name">{profile.name || 'Research Group'}</div>
+            <div className="profile-institution">
+              {profile.institution || ''}{profile.department ? ` · ${profile.department}` : ''}
+            </div>
+          </div>
+        </div>
+        <div>
+          <Icon name="chevronDown" size={18} style={{ color: 'var(--text-muted)', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .25s' }} />
+        </div>
+      </div>
+
+      <div className={`profile-body ${open ? 'open' : ''}`} id="profile-body">
+        <div className="profile-grid">
+          <div className="meta-cell">
+            <div className="meta-key">Research Type</div>
+            <span className={`badge ${typeBadge[profile.type_of_research] || 'badge-slate'}`}>{profile.type_of_research || 'N/A'}</span>
+          </div>
+          <div className="meta-cell">
+            <div className="meta-key">Maturity</div>
+            <span className={`badge ${maturityBadge[profile.maturity_level] || 'badge-slate'}`}>{profile.maturity_level || 'N/A'}</span>
+          </div>
+          <div className="meta-cell">
+            <div className="meta-key">Primary Sector</div>
+            <span className="badge badge-cyan">
+              {primarySector.icon && <Icon name={primarySector.icon} size={11} />}
+              {primarySector.label || profile.primary_sector || 'N/A'}
+            </span>
+          </div>
+          <div className="meta-cell">
+            <div className="meta-key">Confidence</div>
+            <div className="meta-val">{profile.extraction_confidence != null ? `${(profile.extraction_confidence * 100).toFixed(0)}%` : 'N/A'}</div>
+          </div>
+        </div>
+
+        {profile.secondary_sectors && profile.secondary_sectors.length > 0 && (
+          <div className="profile-section">
+            <div className="ps-title"><Icon name="layers" size={12} /> Secondary Sectors</div>
+            <div className="tags-wrap">
+              {profile.secondary_sectors.map((s, i) => {
+                const sec = SECTORS[s.sector] || {};
+                return (
+                  <span key={i} className="tag" style={{ borderColor: sec.color || 'var(--border)', color: sec.color || 'var(--text-secondary)' }}>
+                    {sec.label || s.sector}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {profile.primary_keywords && profile.primary_keywords.length > 0 && (
+          <div className="profile-section">
+            <div className="ps-title"><Icon name="target" size={12} /> Primary Keywords</div>
+            <div className="tags-wrap">
+              {profile.primary_keywords.map((k, i) => <span key={i} className="tag" style={{ borderColor: 'rgba(6,182,212,.3)', color: 'var(--accent-cyan)' }}>{k}</span>)}
+            </div>
+          </div>
+        )}
+
+        {profile.technologies_developed && profile.technologies_developed.length > 0 && (
+          <div className="profile-section">
+            <div className="ps-title"><Icon name="cpu" size={12} /> Technologies Developed</div>
+            <div className="tags-wrap">
+              {profile.technologies_developed.map((t, i) => <span key={i} className="tag">{t}</span>)}
+            </div>
+          </div>
+        )}
+
+        {profile.technical_capabilities && profile.technical_capabilities.length > 0 && (
+          <div className="profile-section">
+            <div className="ps-title"><Icon name="zap" size={12} /> Technical Capabilities</div>
+            <div className="tags-wrap">
+              {profile.technical_capabilities.map((c, i) => <span key={i} className="tag">{c}</span>)}
+            </div>
+          </div>
+        )}
+
+        {profile.research_lines && profile.research_lines.length > 0 && (
+          <div className="profile-section">
+            <div className="ps-title"><Icon name="bookOpen" size={12} /> Research Lines</div>
+            <div>
+              {profile.research_lines.map((rl, i) => (
+                <div key={i} className="research-line-row">
+                  <div className="rl-dot" />
+                  <div>
+                    <div className="rl-name">{rl.name}</div>
+                    {rl.description && <div className="rl-desc">{rl.description}</div>}
+                    {rl.keywords && rl.keywords.length > 0 && <div className="rl-kw">{rl.keywords.join(' · ')}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {profile.explanation && (
+          <div className="profile-section">
+            <div className="ps-title"><Icon name="award" size={12} /> Summary</div>
+            <p style={{ fontSize: '.875rem', color: 'var(--text-secondary)', lineHeight: 1.65 }}>{profile.explanation}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── SECTOR GROUP HEADER ────────────────────────────────────────── */
+function SectorGroupHdr({ sectorCode, sectorLabel, count, isPrimary }) {
+  const cfg = SECTORS[sectorCode] || {};
+  const color = cfg.color || (isPrimary ? 'var(--accent-cyan)' : 'var(--amber)');
+  const typeLabel = isPrimary ? 'PRIMARY' : 'SECONDARY';
+
+  return (
+    <div className="sector-group-hdr" style={{ background: `${color}14`, border: `1px solid ${color}30` }}>
+      <div className="sector-hdr-rule" style={{ background: color, width: 3 }} />
+      <span style={{ color }}><Icon name={cfg.icon || 'target'} size={13} /></span>
+      <span className="sector-hdr-label" style={{ color }}>{typeLabel}</span>
+      <span className="sector-hdr-sublabel">— {sectorLabel || sectorCode}</span>
+      <span className="sector-hdr-count">Top {count}</span>
+    </div>
+  );
+}
+
+/* ─── BY SECTOR VIEW ─────────────────────────────────────────────── */
+function BySectorView({ opportunities }) {
+  const primary   = opportunities.by_sector?.primary || {};
+  const secondary = opportunities.by_sector?.secondary || {};
+
+  return (
+    <div>
+      {/* Primary sector */}
+      {primary.sector_code && (
+        <div className="sector-group">
+          <SectorGroupHdr
+            sectorCode={primary.sector_code}
+            sectorLabel={primary.sector_label}
+            count={5}
+            isPrimary={true}
+          />
+          {primary.top_5 && primary.top_5.length > 0
+            ? <div className="opps-grid">
+                {primary.top_5.map((opp, i) => (
+                  <OppCard key={opp.id || i} opp={opp} rank={i + 1} />
+                ))}
+              </div>
+            : <div className="sector-empty">No primary-sector matches found in the current call corpus.</div>
+          }
+        </div>
+      )}
+
+      {/* Secondary sectors */}
+      {Object.entries(secondary).map(([code, view]) => (
+        <div key={code} className="sector-group">
+          <SectorGroupHdr
+            sectorCode={code}
+            sectorLabel={view.sector_label}
+            count={3}
+            isPrimary={false}
+          />
+          {view.top_3 && view.top_3.length > 0
+            ? <div className="opps-grid">
+                {view.top_3.map((opp, i) => (
+                  <OppCard key={opp.id || i} opp={opp} rank={i + 1} />
+                ))}
+              </div>
+            : <div className="sector-empty">No calls indexed for this sector yet.</div>
+          }
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ─── FULL LIST VIEW ─────────────────────────────────────────────── */
+function FullListView({ opportunities }) {
+  const [query, setQuery] = useState('');
+  const allRanked = opportunities.all_ranked || [];
+
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? allRanked.filter(c =>
+        (c.title || '').toLowerCase().includes(q) ||
+        (c.id    || '').toLowerCase().includes(q)
+      )
+    : allRanked;
+
+  const matchColor = m => m === 'primary' ? '#10b981' : m === 'secondary' ? '#f59e0b' : '#475569';
+
+  return (
+    <div>
+      <div className="full-search-wrap">
+        <div className="full-search-icon"><Icon name="search" size={15} /></div>
+        <input
+          className="full-search-input"
+          type="text"
+          placeholder={`Search ${allRanked.length} opportunities…`}
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          aria-label="Filter opportunities"
+        />
+      </div>
+
+      <div className="full-list-meta">
+        {q
+          ? `${filtered.length} of ${allRanked.length} results for "${query}"`
+          : `${allRanked.length} opportunities · sorted by relevance`
+        }
+      </div>
+
+      <div className="full-list" role="list">
+        {filtered.map((c, i) => {
+          const mc = matchColor(c.sector_match);
+          const statusClass = c.status === 'Abierta' ? 'chip chip-open' : 'chip chip-upcoming';
+          return (
+            <div key={c.id || i} className="full-row" role="listitem">
+              <span className="full-rank">#{i + 1}</span>
+              <span className="full-score" style={{ color: mc }}>{(c.score || 0).toFixed(3)}</span>
+              <span
+                className="full-match-dot"
+                style={{ background: mc }}
+                title={c.sector_match}
+              />
+              <span className="full-title" title={c.title}>{c.title}</span>
+              <div className="full-meta">
+                <span className={statusClass} style={{ fontSize: '.65rem', padding: '2px 6px' }}>
+                  {c.status}
+                </span>
+                {c.deadline && <span className="full-deadline">{c.deadline}</span>}
+              </div>
+            </div>
+          );
+        })}
+        {filtered.length === 0 && (
+          <div style={{ padding: '28px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '.875rem' }}>
+            No results for &ldquo;{query}&rdquo;
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── EXTRACTION HELPERS ─────────────────────────────────────────── */
+
+const PROJECT_TYPES = {
+  RIA:  'Research & Innovation Action',
+  IA:   'Innovation Action',
+  CSA:  'Coordination & Support Action',
+  PCP:  'Pre-Commercial Procurement',
+  PPI:  'Public Procurement of Innovation',
+  MSCA: 'Marie Curie Action',
+  EIC:  'EIC Accelerator',
+  ERC:  'ERC Grant',
+};
+
+function extractProjectType(title, id, scope) {
+  // 1. Parenthetical in title: "(RIA)", "(IA)", "(CSA)"
+  const m = title.match(/\(([A-Z]{2,5})\)/);
+  if (m && PROJECT_TYPES[m[1]]) return { code: m[1], label: PROJECT_TYPES[m[1]] };
+
+  // 2. ID segment: HORIZON-…-RIA-… or HORIZON-…-IAFlag-…
+  for (const [code, label] of Object.entries(PROJECT_TYPES)) {
+    if (new RegExp(`[-_]${code}[-_]`, 'i').test(id)) return { code, label };
+  }
+  if (/MSCA/i.test(id)) return { code: 'MSCA', label: PROJECT_TYPES.MSCA };
+  if (/\/EIC-/.test(id) || /HORIZON-EIC/.test(id)) return { code: 'EIC', label: PROJECT_TYPES.EIC };
+
+  // 3. Scope text
+  const s = (scope || '').toLowerCase();
+  if (/research and innovation action/.test(s)) return { code: 'RIA', label: PROJECT_TYPES.RIA };
+  if (/\binnovation action\b/.test(s) && !/research/.test(s.slice(0, 60))) return { code: 'IA', label: PROJECT_TYPES.IA };
+  if (/coordination and support action/.test(s)) return { code: 'CSA', label: PROJECT_TYPES.CSA };
+
+  return null;
+}
+
+function extractCluster(id) {
+  const m = id.match(/HORIZON-([A-Z0-9-]+?)-\d{4}/i);
+  if (!m) return null;
+  const seg = m[1].toUpperCase();
+  const map = {
+    'CL1': 'Cluster 1 · Health',
+    'CL2': 'Cluster 2 · Culture',
+    'CL3': 'Cluster 3 · Security',
+    'CL4': 'Cluster 4 · Digital & Industry',
+    'CL5': 'Cluster 5 · Energy',
+    'CL6': 'Cluster 6 · Food & Agriculture',
+    'MSCA': 'Marie Curie Actions',
+    'EIC': 'European Innovation Council',
+    'ERC': 'European Research Council',
+    'INFRA': 'Research Infrastructures',
+    'WIDERA': 'Widening & ERA',
+  };
+  // match prefix of seg
+  for (const [prefix, label] of Object.entries(map)) {
+    if (seg.startsWith(prefix)) return label;
+  }
+  return seg.split('-')[0];   // fallback: first segment
+}
+
+function extractEligibility(scope) {
+  if (!scope) return null;
+  const s = scope.toLowerCase();
+  const found = [];
+  if (/\bsme\b/.test(s) || /small.{1,10}medium.{1,10}enterprise/i.test(s)) found.push('SMEs');
+  if (/\bstart.?up\b/.test(s)) found.push('Start-ups');
+  if (/\bconsortium\b/.test(s)) found.push('Consortium');
+  if (/\bacademi|\bresearch organ/i.test(s)) found.push('Academia');
+  if (/\bindustry\b/i.test(s) && !/industry 4/i.test(s)) found.push('Industry');
+  if (found.length === 0) return 'EU-wide';
+  return found.slice(0, 2).join(' · ');
+}
+
+function truncateScope(scope, maxChars = 220) {
+  if (!scope) return null;
+  const cleaned = scope.replace(/\s+/g, ' ').trim();
+  if (cleaned.length <= maxChars) return cleaned;
+  // break at last word boundary
+  const cut = cleaned.lastIndexOf(' ', maxChars);
+  return cleaned.slice(0, cut > 0 ? cut : maxChars) + '…';
+}
+
+function formatDeadline(deadline, status) {
+  if (!deadline) return null;
+  const verb = status === 'Abierta' ? 'Open until' : 'Opens';
+  return `${verb} ${deadline}`;
+}
+
+/* ─── OPP DETAIL PANEL ──────────────────────────────────────────── */
+
+function OppDetailPanel({ call, onClose, onViewDetail }) {
+  if (!call) return null;
+
+  /* ── Derived values ── */
+  const match       = call.sector_match || 'none';
+  const borderColor = match === 'primary'   ? '#10b981'
+                    : match === 'secondary' ? '#f59e0b'
+                    : '#475569';
+  const matchLabel  = match === 'primary'   ? 'Primary'
+                    : match === 'secondary' ? 'Secondary'
+                    : 'Low Match';
+  const statusLabel = call.status === 'Abierta' ? 'Open' : 'Upcoming';
+  const statusClass = call.status === 'Abierta' ? 'oc-badge oc-badge-open' : 'oc-badge oc-badge-upcoming';
+
+  const sectorCfg   = SECTORS[call.call_sector] || {};
+  const sectorLabel = sectorCfg.label || call.call_sector || '—';
+  const sectorColor = sectorCfg.color || 'var(--text-muted)';
+
+  const scope       = call.scope || '';
+  const projType    = extractProjectType(call.title || '', call.id || '', scope);
+  const cluster     = extractCluster(call.id || '');
+  const eligibility = extractEligibility(scope);
+  const deadlineFmt = formatDeadline(call.deadline, call.status);
+  const scopeSnip   = truncateScope(scope, 220);
+
+  /* Lock body scroll */
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  /* Escape key */
+  useEffect(() => {
+    const h = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [onClose]);
+
+  return (
+    <>
+      {/* Overlay */}
+      <div className="panel-overlay" onClick={onClose} aria-hidden="true" />
+
+      {/* Panel */}
+      <div
+        className="opp-panel"
+        role="dialog" aria-modal="true"
+        aria-label={`Detalles: ${call.title}`}
+      >
+        {/* ── Topbar: close · score ring ── */}
+        <div className="panel-topbar">
+          <button className="panel-close" onClick={onClose} aria-label="Cerrar panel">
+            <Icon name="x" size={17} />
+          </button>
+          <ScoreRing score={call.score} match={match} size={56} />
+        </div>
+
+        {/* ── Hero: colored left strip · ID · title ── */}
+        <div className="panel-hero" style={{ borderLeftColor: borderColor }}>
+          <div className="panel-id">{call.id}</div>
+          <div className="panel-title">{call.title}</div>
+        </div>
+
+        {/* ── Badge strip ── */}
+        <div className="panel-badges">
+          <span className={statusClass}>{statusLabel}</span>
+          <span className={`oc-match-badge oc-match-${match}`}>{matchLabel}</span>
+          {call.deadline && (
+            <span className="oc-badge oc-badge-deadline">
+              <Icon name="calendar" size={10} />{call.deadline}
+            </span>
+          )}
+          <span
+            className="panel-sector-badge"
+            style={{ color: sectorColor, borderColor: `${sectorColor}44`, background: `${sectorColor}14` }}
+          >
+            {sectorCfg.icon && <Icon name={sectorCfg.icon} size={10} />}
+            {sectorLabel}
+          </span>
+        </div>
+
+        {/* ── 2 × 2 detail grid ── */}
+        <div className="detail-grid">
+          {/* top-left: deadline */}
+          <div className="detail-cell">
+            <div className="detail-cell-label">Deadline</div>
+            {deadlineFmt
+              ? <div className="detail-cell-value">{deadlineFmt}</div>
+              : <div className="detail-cell-value" style={{ color: 'var(--text-muted)' }}>—</div>
+            }
+          </div>
+
+          {/* top-right: project type */}
+          <div className="detail-cell">
+            <div className="detail-cell-label">Project type</div>
+            {projType
+              ? <>
+                  <span className="detail-type-badge">{projType.code}</span>
+                  <div className="detail-cell-sub">{projType.label}</div>
+                </>
+              : <div className="detail-cell-value" style={{ color: 'var(--text-muted)' }}>—</div>
+            }
+          </div>
+
+          {/* bottom-left: cluster/program */}
+          <div className="detail-cell">
+            <div className="detail-cell-label">Programme</div>
+            <div className="detail-cell-value">{cluster || '—'}</div>
+          </div>
+
+          {/* bottom-right: eligibility */}
+          <div className="detail-cell">
+            <div className="detail-cell-label">Eligibility</div>
+            <div className="detail-cell-value">{eligibility || 'EU-wide'}</div>
+          </div>
+        </div>
+
+        {/* ── Scope preview ── */}
+        <div className="panel-gap" />
+        {scopeSnip && (
+          <div className="scope-section">
+            <div className="scope-label">Scope</div>
+            <div className="scope-text">{scopeSnip}</div>
+          </div>
+        )}
+
+        {/* ── Footer ── */}
+        <div className="panel-footer">
+          <button
+            className="panel-btn-primary"
+            onClick={() => onViewDetail && onViewDetail(call)}
+            disabled={!onViewDetail}
+          >
+            <Icon name="externalLink" size={14} />Ver más detalles
+          </button>
+          <button className="panel-btn-close" onClick={onClose}>
+            <Icon name="x" size={14} />Cerrar
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ─── DETAIL PAGE VIEW ──────────────────────────────────────────── */
+function DetailPageView({ call, onBack }) {
+  const match       = call.sector_match || 'none';
+  const borderColor = match === 'primary'   ? '#10b981'
+                    : match === 'secondary' ? '#f59e0b'
+                    : '#475569';
+  const matchLabel  = match === 'primary'   ? 'Primary'
+                    : match === 'secondary' ? 'Secondary'
+                    : 'Low Match';
+  const statusLabel = call.status === 'Abierta' ? 'Open' : 'Upcoming';
+  const statusClass = call.status === 'Abierta' ? 'oc-badge oc-badge-open' : 'oc-badge oc-badge-upcoming';
+
+  const sectorCfg   = SECTORS[call.call_sector] || {};
+  const sectorLabel = sectorCfg.label || call.call_sector || '—';
+  const sectorColor = sectorCfg.color || 'var(--text-muted)';
+
+  const scope       = call.scope || '';
+  const projType    = extractProjectType(call.title || '', call.id || '', scope);
+  const cluster     = extractCluster(call.id || '');
+  const eligibility = extractEligibility(scope);
+  const deadlineFmt = formatDeadline(call.deadline, call.status);
+
+  /* Escape → back */
+  useEffect(() => {
+    const h = (e) => { if (e.key === 'Escape') onBack(); };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [onBack]);
+
+  return (
+    <div className="detail-page" role="main" aria-label="Call details">
+
+      {/* ── Header ── */}
+      <header className="detail-header">
+        <button className="detail-back-btn" onClick={onBack}>
+          <Icon name="chevronLeft" size={15} />Volver a resultados
+        </button>
+        <span className="detail-header-id">{call.id}</span>
+      </header>
+
+      {/* ── Scrollable body ── */}
+      <div className="detail-content">
+
+        {/* Hero: ID · title · score + badges */}
+        <div className="detail-hero" style={{ borderLeftColor: borderColor }}>
+          <div className="detail-id">{call.id}</div>
+          <h1 className="detail-title">{call.title}</h1>
+          <div className="detail-score-row">
+            <ScoreRing score={call.score} match={match} size={52} />
+            <span className={statusClass}>{statusLabel}</span>
+            <span className={`oc-match-badge oc-match-${match}`}>{matchLabel}</span>
+            {call.deadline && (
+              <span className="oc-badge oc-badge-deadline">
+                <Icon name="calendar" size={10} />{call.deadline}
+              </span>
+            )}
+            <span
+              className="panel-sector-badge"
+              style={{ color: sectorColor, borderColor: `${sectorColor}44`, background: `${sectorColor}14` }}
+            >
+              {sectorCfg.icon && <Icon name={sectorCfg.icon} size={10} />}
+              {sectorLabel}
+            </span>
+          </div>
+        </div>
+
+        {/* Details grid: 2 × 2 */}
+        <div className="detail-section">
+          <div className="detail-section-title">Details</div>
+          <div className="detail-info-grid">
+            <div className="detail-info-cell">
+              <div className="detail-info-lbl">Programme</div>
+              <div className="detail-info-val">{cluster || '—'}</div>
+            </div>
+            <div className="detail-info-cell">
+              <div className="detail-info-lbl">Project type</div>
+              {projType
+                ? <>
+                    <span className="detail-type-badge">{projType.code}</span>
+                    <div className="detail-info-sub">{projType.label}</div>
+                  </>
+                : <div className="detail-info-val">—</div>
+              }
+            </div>
+            <div className="detail-info-cell">
+              <div className="detail-info-lbl">Deadline</div>
+              <div className="detail-info-val">{deadlineFmt || call.deadline || '—'}</div>
+            </div>
+            <div className="detail-info-cell">
+              <div className="detail-info-lbl">Eligibility</div>
+              <div className="detail-info-val">{eligibility || 'EU-wide'}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Official link banner */}
+        <div className="detail-portal-banner">
+          <div className="detail-portal-text">
+            <Icon name="externalLink" size={14} style={{ flexShrink: 0 }} />
+            <span>Horizon Europe Funding Portal</span>
+          </div>
+          <a
+            className="detail-portal-btn"
+            href={`https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/${call.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Ver documento oficial de ${call.id} en Horizon Portal`}
+          >
+            Ver documento oficial
+            <Icon name="externalLink" size={13} />
+          </a>
+        </div>
+
+        {/* Full scope */}
+        {scope && (
+          <div className="detail-section">
+            <div className="detail-section-title">Full Scope</div>
+            <div className="detail-scope-text">{scope}</div>
+          </div>
+        )}
+
+      </div>
+
+      {/* ── Footer ── */}
+      <footer className="detail-footer">
+        <button className="detail-back-btn" onClick={onBack}>
+          <Icon name="chevronLeft" size={15} />Volver a resultados
+        </button>
+        <a
+          className="detail-portal-btn detail-portal-btn-sm"
+          href={`https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/${call.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Horizon Portal <Icon name="externalLink" size={12} />
+        </a>
+      </footer>
+    </div>
+  );
+}
+
+/* ─── MAIN APP ───────────────────────────────────────────────────── */
+function App() {
+  const [url, setUrl] = useState('https://ging.github.io/');
+  const [loading, setLoading]       = useState(false);
+  const [data, setData]             = useState(null);
+  const [profileOpen, setProfileOpen] = useState(true);
+  const [activeTab, setActiveTab]   = useState('quick');
+  const [selectedOpp, setSelectedOpp] = useState(null);
+  const [detailCall,  setDetailCall]  = useState(null);
+  const { toasts, add: addToast, remove: removeToast } = useToasts();
+  const inputRef = useRef(null);
+
+  const analyze = async () => {
+    const trimmed = url.trim();
+    if (!trimmed) { addToast('Please enter a valid URL', 'error'); return; }
+
+    setLoading(true);
+    setData(null);
+    setActiveTab('quick');
+    setSelectedOpp(null);
+    setDetailCall(null);
+
+    try {
+      const res = await fetch('{`${API_BASE}/analyze`}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: trimmed, force_refresh: false, detail_level: 'full' }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: res.statusText }));
+        throw new Error(err.detail || 'Analysis failed');
+      }
+
+      const result = await res.json();
+      setData(result);
+      setProfileOpen(true);
+      addToast(`Profile ready: ${result.profile?.name || 'Group'}`, 'success');
+    } catch (err) {
+      const msg = err.message.includes('fetch')
+        ? 'Cannot connect to API. Start: uvicorn api:app --port 8000'
+        : err.message;
+      addToast(msg, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKey = (e) => { if (e.key === 'Enter') analyze(); };
+
+  /* Normalise the opportunities payload: the backend always returns the
+     structured dict when detail_level="full", but guard against flat arrays. */
+  const opps = data?.opportunities;
+  const isStructured = opps && !Array.isArray(opps) && opps.top_10_general;
+  const quickList  = isStructured ? (opps.top_10_general || []) : (Array.isArray(opps) ? opps : []);
+  const totalCount = isStructured ? (opps.all_ranked?.length || quickList.length) : quickList.length;
+  const hasOpps    = quickList.length > 0;
+
+  const tabs = [
+    { id: 'quick',   icon: 'zap',      label: 'Quick View',  count: quickList.length },
+    { id: 'sector',  icon: 'pieChart', label: 'By Sector',   count: null },
+    { id: 'full',    icon: 'list',     label: 'Full List',   count: totalCount },
+  ];
+
+  return (
+    <div className="app-shell">
+      {detailCall && (
+        <DetailPageView
+          call={detailCall}
+          onBack={() => setDetailCall(null)}
+        />
+      )}
+      {selectedOpp && (
+        <OppDetailPanel
+          call={selectedOpp}
+          onClose={() => setSelectedOpp(null)}
+          onViewDetail={setDetailCall}
+        />
+      )}
+      <ToastContainer toasts={toasts} remove={removeToast} />
+
+      {/* ── TOPBAR ── */}
+      <nav className="topbar" role="navigation" aria-label="Main navigation">
+        <a href="#" className="logo" aria-label="Research Funding Assistant home">
+          <div className="logo-icon" aria-hidden="true">
+            <Icon name="target" size={14} style={{ color: 'white' }} />
+          </div>
+          Research Funding Assistant
+        </a>
+        <div className="topbar-right">
+          <div className="status-dot" aria-hidden="true" />
+          <span className="status-label">API</span>
+        </div>
+      </nav>
+
+      {/* ── MAIN ── */}
+      <main className="main-content" role="main">
+
+        {/* Hero */}
+        <div className="hero">
+          <div className="hero-badge" aria-label="Powered by Horizon Europe">
+            <Icon name="zap" size={11} />
+            Horizon Europe · AI-Powered
+          </div>
+          <h1>Find the right funding<br />for your research</h1>
+          <p>Analyze any research group and instantly discover the most relevant European funding opportunities.</p>
+        </div>
+
+        {/* Search */}
+        <div className="search-card">
+          <label className="search-label" htmlFor="url-input">Research group website</label>
+          <div className="search-row">
+            <div className="search-input-wrap">
+              <div className="search-input-icon" aria-hidden="true"><Icon name="globe" size={16} /></div>
+              <input
+                id="url-input"
+                ref={inputRef}
+                className="search-input"
+                type="url"
+                placeholder="https://yourgroup.university.edu"
+                value={url}
+                onChange={e => setUrl(e.target.value)}
+                onKeyDown={handleKey}
+                disabled={loading}
+                aria-label="Research group URL"
+                autoComplete="off"
+              />
+            </div>
+            <button
+              className="btn-primary"
+              onClick={analyze}
+              disabled={loading}
+              aria-label={loading ? 'Analyzing...' : 'Analyze research group'}
+            >
+              {loading
+                ? <><div className="spinner" aria-hidden="true" /> Analyzing…</>
+                : <><Icon name="search" size={15} aria-hidden="true" /> Analyze</>
+              }
+            </button>
+          </div>
+        </div>
+
+        {/* Loading skeletons */}
+        {loading && (
+          <>
+            <div className="section-header">
+              <div className="section-title"><Icon name="building" size={13} /> Profile</div>
+            </div>
+            <SkeletonProfile />
+            <div className="section-header" style={{ marginTop: 16 }}>
+              <div className="section-title"><Icon name="award" size={13} /> Opportunities</div>
+            </div>
+            <SkeletonOpps />
+          </>
+        )}
+
+        {/* Results */}
+        {!loading && data && (
+          <>
+            {/* Profile card */}
+            <div className="section-header">
+              <div className="section-title"><Icon name="building" size={13} /> Research Profile</div>
+            </div>
+            <ProfileCard
+              profile={data.profile}
+              open={profileOpen}
+              onToggle={() => setProfileOpen(o => !o)}
+            />
+
+            {/* Opportunities section */}
+            {hasOpps && (
+              <>
+                <div className="section-header" style={{ marginTop: 8 }}>
+                  <div className="section-title">
+                    <Icon name="award" size={13} />
+                    Opportunities
+                  </div>
+                  <span className="section-pill">{totalCount} in corpus</span>
+                </div>
+
+                {/* Tab bar */}
+                <div className="tabs-bar" role="tablist" aria-label="Opportunity views">
+                  {tabs.map(tab => (
+                    <button
+                      key={tab.id}
+                      className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
+                      onClick={() => setActiveTab(tab.id)}
+                      role="tab"
+                      aria-selected={activeTab === tab.id}
+                      aria-controls={`tabpanel-${tab.id}`}
+                    >
+                      <Icon name={tab.icon} size={13} />
+                      <span>{tab.label}</span>
+                      {tab.count != null && (
+                        <span className="tab-count">{tab.count}</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Tab panels */}
+                <div id="tabpanel-quick" role="tabpanel" aria-label="Quick View" hidden={activeTab !== 'quick'}>
+                  {activeTab === 'quick' && (
+                    <div className="opps-grid" role="list" aria-label="Top 10 opportunities">
+                      {quickList.map((opp, i) => (
+                        <OppCard
+                          key={opp.id || i}
+                          opp={opp}
+                          rank={i + 1}
+                          onClick={setSelectedOpp}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div id="tabpanel-sector" role="tabpanel" aria-label="By Sector" hidden={activeTab !== 'sector'}>
+                  {activeTab === 'sector' && isStructured && (
+                    <BySectorView opportunities={opps} />
+                  )}
+                  {activeTab === 'sector' && !isStructured && (
+                    <div className="sector-empty">Sector view requires detail_level=full from the API.</div>
+                  )}
+                </div>
+
+                <div id="tabpanel-full" role="tabpanel" aria-label="Full List" hidden={activeTab !== 'full'}>
+                  {activeTab === 'full' && isStructured && (
+                    <FullListView opportunities={opps} />
+                  )}
+                  {activeTab === 'full' && !isStructured && (
+                    <FullListView opportunities={{ all_ranked: quickList }} />
+                  )}
+                </div>
+              </>
+            )}
+          </>
+        )}
+
+        {/* Empty state */}
+        {!loading && !data && (
+          <div className="empty-state" role="region" aria-label="Get started">
+            <div className="empty-icon" aria-hidden="true"><Icon name="search" size={28} /></div>
+            <h3>Enter a URL to get started</h3>
+            <p>Paste your research group's website above and click Analyze</p>
+          </div>
+        )}
+      </main>
+
+      {/* ── FOOTER ── */}
+      <footer className="footer" role="contentinfo">
+        <div className="footer-left">
+          <Icon name="zap" size={12} aria-hidden="true" />
+          Research Funding Assistant · MVP
+        </div>
+        <nav className="footer-right" aria-label="Footer links">
+          <a href={`${API_BASE}/docs`} target="_blank" rel="noopener noreferrer" className="footer-link">API Docs</a>
+          <a href={`${API_BASE}/health`} target="_blank" rel="noopener noreferrer" className="footer-link">Health</a>
+        </nav>
+      </footer>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

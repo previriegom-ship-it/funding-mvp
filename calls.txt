@@ -1,0 +1,64 @@
+---
+ID: HORIZON-CL4-2026-05-DIGITAL-EMERGING-02
+TÍTULO: Next-Generation AI Agents for Real-World Applications
+CLUSTER: Cluster 4 — Digital
+ESTADO: Abierta
+DEADLINE: 17 septiembre 2026
+BUDGET: ~€20M · RIA
+SCOPE: Agentes IA de nueva generación para aplicaciones reales en sectores prioritarios. Busca sistemas agénticos capaces de resolver problemas complejos. Incluye educación, salud, industria y servicios públicos.
+---
+ID: HORIZON-HLTH-2026-01-DISEASE-02
+TÍTULO: Innovative interventions to prevent harmful effects of using digital technologies on mental health of children and young adults
+CLUSTER: Cluster 1 — Health
+ESTADO: Cerrada
+DEADLINE: 16 abril 2026
+BUDGET: €45M total · €8M/proyecto · 6 proyectos · RIA
+SCOPE: Intervenciones preventivas contra efectos negativos de tecnologías digitales en salud mental de jóvenes. Busca herramientas digitales innovadoras y metodologías de prevención.
+---
+ID: HORIZON-CL5-2026-01-D6-14
+TÍTULO: Predicting and avoiding road crashes based on Artificial Intelligence and big data
+CLUSTER: Cluster 5 — Mobility
+ESTADO: Cerrada
+DEADLINE: 20 enero 2026
+BUDGET: €7-10M/proyecto · hasta €30M total · RIA
+SCOPE: IA y big data para predecir evitar accidentes de tráfico. Incluye digital twins de infraestructura y análisis de datos de alto riesgo.
+---
+ID: HORIZON-CL4-2026-04-DATA-06
+TÍTULO: Efficient and compliant access to and use of data
+CLUSTER: Cluster 4 — Digital
+ESTADO: Cerrada
+DEADLINE: 15 abril 2026
+BUDGET: €30-40M total · IA
+SCOPE: Acceso seguro e interoperable a datos. Data spaces, cumplimiento GDPR y Data Act. Sistemas distribuidos y gobernanza de datos.
+---
+ID: HORIZON-CL5-2026-10-D6-03
+TÍTULO: Generative AI for smarter CCAM: enhancing perception, decision-making, and validation
+CLUSTER: Cluster 5 — Mobility
+ESTADO: Abierta (Q4 2026)
+DEADLINE: Por confirmar
+BUDGET: Budget por confirmar
+SCOPE: GenAI para sistemas CCAM. Mejora de percepción, toma de decisiones y validación. Autonomous mobility systems.
+---
+ID: HORIZON-RAISE-2026-01-01
+TÍTULO: Thematic Networks of Excellence for AI in Science
+CLUSTER: Cluster 4 — Digital
+ESTADO: Cerrada
+DEADLINE: 21 abril 2026
+BUDGET: €15M · 1 proyecto · RIA
+SCOPE: Redes pan-europeas de laboratorios de excelencia en IA aplicada a ciencia. Benchmarks y datasets compartidos. Modelos IA para investigación.
+---
+ID: HORIZON-CL5-2026-01-D6-05
+TÍTULO: Approaches, verification and training for Edge-AI building blocks for CCAM Systems
+CLUSTER: Cluster 5 — Mobility
+ESTADO: Cerrada
+DEADLINE: 20 enero 2026
+BUDGET: €5-8M/proyecto · RIA
+SCOPE: Metodologías de verificación y entrenamiento de modelos Edge-AI para vehículos autónomos. Formación de técnicos y certificación de sistemas.
+---
+ID: HORIZON-CL5-2026-01-D6-06
+TÍTULO: Federated CCAM data exchange platform
+CLUSTER: Cluster 5 — Mobility
+ESTADO: Cerrada
+DEADLINE: 20 enero 2026
+BUDGET: €8-12M/proyecto · IA
+SCOPE: Plataforma federada de intercambio de datos para CCAM. Data spaces, gobernanza de datos distribuida, interoperabilidad.

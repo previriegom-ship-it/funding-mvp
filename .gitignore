@@ -1,0 +1,33 @@
+﻿# Environment — never commit secrets
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+.pytest_cache/
+
+# Logs
+logs/
+*.log
+
+# Profile cache (local data, can be regenerated)
+profiles/
+
+# Call data files (large, regeneratable — rebuild with: python calls_index.py)
+calls_index.json
+calls_live.txt
+
+# OS artefacts
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
