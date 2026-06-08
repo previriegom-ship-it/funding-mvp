@@ -910,8 +910,8 @@ function showDetail(index) {
     console.log('[RFI] showDetail — id:', call.id);
 
     renderDetailPanel(call);
-    resultsDiv.style.display = 'none';
-    detailDiv.style.display = 'block';
+    resultsDiv.classList.add('hidden');
+    detailDiv.classList.remove('hidden');
     detailDiv.scrollTop = 0;
     document.body.style.overflow = 'hidden';
   } catch (err) {
@@ -1213,8 +1213,8 @@ function goBack() {
   console.log('[RFI] goBack()');
   window.state.currentView = 'top10';
   window.state.selectedCall = null;
-  detailDiv.style.display = 'none';
-  resultsDiv.style.display = 'block';
+  detailDiv.classList.add('hidden');
+  resultsDiv.classList.remove('hidden');
   document.body.style.overflow = '';
 }
 

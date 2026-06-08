@@ -134,7 +134,16 @@ def score_call(
     call: dict,
     profile: dict | None = None,
 ) -> tuple[float, str]:
-    """Score a call by weighted keyword overlap with the profile.
+    """Score a call by profile coverage — fraction of profile vocabulary found.
+
+    Formula: matched_weight / total_profile_weight
+      - Numerator:   sum of weights for profile terms that appear in the call.
+      - Denominator: total weight of all profile terms (constant per request).
+
+    This measures "how much of the research group's vocabulary is covered by
+    this call" — a longer, richer scope can only help, never hurt.  The old
+    formula (matched / call_term_count) penalised long scopes because adding
+    more unmatched terms shrank the score even when matched terms increased.
 
     Returns (score, sector_match) where sector_match is
     "primary" | "secondary" | "none".
@@ -144,8 +153,9 @@ def score_call(
     if not call_terms:
         return 0.0, "none"
 
+    total_profile_weight = sum(profile_weights.values()) or 1.0
     matched_weight = sum(profile_weights[t] for t in call_terms if t in profile_weights)
-    base_score = matched_weight / len(call_terms)
+    base_score = matched_weight / total_profile_weight
 
     sector_match = "none"
     multiplier = 0.7  # default: sector mismatch
