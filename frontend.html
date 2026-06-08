@@ -358,6 +358,122 @@ a:hover{text-decoration:underline}
 .wp-label,.deliv-label{color:var(--text-secondary);line-height:1.5}
 
 /* ═══════════════════════════════════════════════════════════
+   VIEW TABS
+   ═══════════════════════════════════════════════════════════ */
+.tabs-wrap{max-width:1200px;margin:0 auto;padding:20px 24px 0}
+.tabs-bar{
+  display:flex;gap:4px;
+  border-bottom:2px solid var(--border);
+}
+.tab-btn{
+  padding:10px 22px;border:none;background:transparent;
+  color:var(--text-muted);font-weight:600;font-size:.88rem;
+  font-family:var(--font);cursor:pointer;border-radius:var(--radius) var(--radius) 0 0;
+  border:1px solid transparent;border-bottom:none;
+  margin-bottom:-2px;transition:color .15s,background .15s,border-color .15s;
+  white-space:nowrap;
+}
+.tab-btn.active{
+  background:var(--bg-surface);color:var(--text);
+  border-color:var(--border);border-bottom-color:var(--bg-surface);
+}
+.tab-btn:hover:not(.active){color:var(--text-secondary)}
+
+/* ═══════════════════════════════════════════════════════════
+   BY-SECTOR VIEW
+   ═══════════════════════════════════════════════════════════ */
+.sector-group{margin-bottom:36px}
+.sector-group-header{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:14px;padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+}
+.sector-group-icon{font-size:1.2rem}
+.sector-group-title{font-size:1.05rem;font-weight:700}
+.sector-group-count{font-size:.78rem;color:var(--text-muted);margin-left:auto}
+.sector-group-badge{
+  font-size:.72rem;font-weight:700;padding:2px 9px;border-radius:10px;
+  background:var(--green-dim);color:var(--green);border:1px solid rgba(16,185,129,.25);
+}
+.sector-group-badge.secondary-sector{
+  background:var(--violet-dim);color:var(--violet);border:1px solid rgba(167,139,250,.25);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FULL LIST VIEW
+   ═══════════════════════════════════════════════════════════ */
+.fl-controls{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.fl-select{
+  padding:8px 12px;border-radius:var(--radius);
+  background:var(--bg-surface);border:1px solid var(--border);
+  color:var(--text);font-family:var(--font);font-size:.83rem;cursor:pointer;
+  outline:none;transition:border-color .15s;
+}
+.fl-select:focus{border-color:var(--accent)}
+.fl-count{
+  margin-left:auto;font-size:.8rem;color:var(--text-muted);white-space:nowrap;
+}
+.fl-list{
+  display:flex;flex-direction:column;
+  border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;
+}
+.fl-row{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 16px;cursor:pointer;
+  border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.fl-row:last-child{border-bottom:none}
+.fl-row:hover{background:var(--bg-surface-hover)}
+.fl-rank{
+  font-size:.7rem;font-weight:700;color:var(--text-muted);
+  min-width:26px;text-align:right;flex-shrink:0;
+}
+.fl-title-col{flex:1;min-width:0;overflow:hidden}
+.fl-call-id{
+  font-family:var(--mono);font-size:.68rem;font-weight:700;
+  color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.fl-call-title{
+  font-size:.84rem;font-weight:500;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;
+}
+.fl-sector-col{
+  font-size:.75rem;color:var(--text-muted);
+  min-width:90px;max-width:120px;flex-shrink:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.fl-deadline-col{
+  font-size:.75rem;color:var(--text-secondary);
+  min-width:80px;flex-shrink:0;text-align:right;
+}
+.fl-portal-col{flex-shrink:0}
+.fl-pagination{
+  display:flex;justify-content:center;align-items:center;
+  gap:6px;margin-top:20px;flex-wrap:wrap;
+}
+.fl-page-btn{
+  padding:7px 14px;border-radius:var(--radius);
+  background:var(--bg-surface);border:1px solid var(--border);
+  color:var(--text-secondary);font-size:.82rem;font-weight:600;
+  cursor:pointer;font-family:var(--font);transition:background .15s,border-color .15s;
+}
+.fl-page-btn.active{
+  background:var(--accent-dim);border-color:rgba(0,217,255,.35);color:var(--accent);
+}
+.fl-page-btn:hover:not(.active):not(:disabled){
+  background:var(--bg-surface-hover);border-color:var(--border-light);
+}
+.fl-page-btn:disabled{opacity:.35;cursor:not-allowed}
+@media(max-width:768px){
+  .fl-sector-col,.fl-deadline-col{display:none}
+  .fl-row{gap:8px;padding:10px 12px}
+}
+
+/* ═══════════════════════════════════════════════════════════
    ANIMATIONS
    ═══════════════════════════════════════════════════════════ */
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -414,13 +530,26 @@ a:hover{text-decoration:underline}
 <!-- ═══ ERROR ═══ -->
 <div id="error-container"></div>
 
-<!-- ═══ RESULTS (top 10) ═══ -->
+<!-- ═══ RESULTS (all views) ═══ -->
 <div id="results" class="hidden">
   <div id="profile-bar"></div>
-  <div class="results-wrap">
+  <!-- TAB NAV -->
+  <div class="tabs-wrap" id="view-tabs">
+    <div class="tabs-bar">
+      <button class="tab-btn active" id="tab-top10"     data-view="top10"     onclick="switchView('top10')">🏆 Top 10</button>
+      <button class="tab-btn"        id="tab-by-sector" data-view="by-sector" onclick="switchView('by-sector')">📊 By Sector</button>
+      <button class="tab-btn"        id="tab-full-list" data-view="full-list" onclick="switchView('full-list')">📋 Full List</button>
+    </div>
+  </div>
+  <!-- VIEW: TOP 10 -->
+  <div id="view-top10" class="results-wrap">
     <div class="section-title">🏆 Top 10 Opportunities</div>
     <div class="card-grid" id="card-grid"></div>
   </div>
+  <!-- VIEW: BY SECTOR -->
+  <div id="view-by-sector" class="results-wrap hidden"></div>
+  <!-- VIEW: FULL LIST -->
+  <div id="view-full-list" class="results-wrap hidden"></div>
 </div>
 </main>
 
@@ -448,7 +577,12 @@ window.state = {
   profile: null,
   opportunities: null,
   selectedCall: null,
-  currentView: 'top10'
+  currentView: 'top10',
+  prevView: 'top10',         // view to return to from detail
+  fullListPage: 0,
+  fullListSort: 'score',
+  fullListFilterStatus: 'all',
+  fullListFilterSector: 'all'
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -883,7 +1017,7 @@ function renderTopOpportunities() {
       if (card && card.dataset.index !== undefined) {
         var idx = parseInt(card.dataset.index, 10);
         console.log('[RFI] Card clicked — index:', idx);
-        showDetail(idx);
+        showDetail(calls[idx], 'top10');
       }
     };
 
@@ -895,19 +1029,18 @@ function renderTopOpportunities() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   3. showDetail(index)
+   3. showDetail(call, sourceView)
+      call      — the actual call object (not an index)
+      sourceView — which view to return to (default: currentView)
    ═══════════════════════════════════════════════════════════ */
-function showDetail(index) {
-  console.log('[RFI] showDetail — index:', index);
+function showDetail(call, sourceView) {
+  console.log('[RFI] showDetail — id:', call && call.id);
   try {
-    var calls = (window.state.opportunities && window.state.opportunities.top_10_general) ? window.state.opportunities.top_10_general : [];
-    var call = calls[index];
-    if (!call) { console.error('[RFI] showDetail: no call at index', index); return; }
+    if (!call) { console.error('[RFI] showDetail: null call'); return; }
 
+    window.state.prevView = sourceView || window.state.currentView;
     window.state.selectedCall = call;
     window.state.currentView = 'detail';
-
-    console.log('[RFI] showDetail — id:', call.id);
 
     renderDetailPanel(call);
     resultsDiv.classList.add('hidden');
@@ -1207,15 +1340,304 @@ function renderDetailPanel(call) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   5. goBack()
+   switchView(view, doRender)
+   ═══════════════════════════════════════════════════════════ */
+function switchView(view, doRender) {
+  if (view === 'detail') return; // detail handled by showDetail
+  window.state.currentView = view;
+
+  // Tab buttons
+  var tabs = document.querySelectorAll('.tab-btn');
+  for (var t = 0; t < tabs.length; t++) {
+    tabs[t].classList.toggle('active', tabs[t].dataset.view === view);
+  }
+
+  // Show/hide view containers
+  $('view-top10').classList.toggle('hidden',    view !== 'top10');
+  $('view-by-sector').classList.toggle('hidden', view !== 'by-sector');
+  $('view-full-list').classList.toggle('hidden', view !== 'full-list');
+
+  if (doRender === false) return;
+  if (view === 'by-sector') renderBySector();
+  if (view === 'full-list') renderFullList(window.state.fullListPage);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   renderBySector() — groups calls by sector
+   ═══════════════════════════════════════════════════════════ */
+function renderBySector() {
+  var container = $('view-by-sector');
+  var opp = window.state.opportunities;
+  if (!opp || !opp.by_sector) {
+    container.innerHTML = '<p style="color:var(--text-muted)">Sector data not available.</p>';
+    return;
+  }
+  var bySector = opp.by_sector;
+  var parts = [];
+
+  // Primary sector group
+  var prim = bySector.primary || {};
+  var primCalls = prim.top_5 || [];
+  if (primCalls.length > 0) {
+    var si = sectorInfo(prim.sector_code);
+    parts.push('<div class="sector-group">');
+    parts.push('  <div class="sector-group-header">');
+    parts.push('    <span class="sector-group-icon">' + si.icon + '</span>');
+    parts.push('    <span class="sector-group-title">' + escHtml(si.label) + '</span>');
+    parts.push('    <span class="sector-group-badge">Primary Sector</span>');
+    parts.push('    <span class="sector-group-count">Top ' + primCalls.length + ' calls</span>');
+    parts.push('  </div>');
+    parts.push('  <div class="card-grid">');
+    for (var pi = 0; pi < primCalls.length; pi++) {
+      parts.push(buildMiniCard(primCalls[pi], pi, 'by-sector'));
+    }
+    parts.push('  </div>');
+    parts.push('</div>');
+  }
+
+  // Secondary sector groups
+  var secGroups = bySector.secondary || {};
+  var secKeys = Object.keys(secGroups);
+  for (var sk = 0; sk < secKeys.length; sk++) {
+    var grp = secGroups[secKeys[sk]];
+    var grpCalls = grp.top_3 || [];
+    if (grpCalls.length === 0) continue;
+    var gsi = sectorInfo(grp.sector_code);
+    parts.push('<div class="sector-group">');
+    parts.push('  <div class="sector-group-header">');
+    parts.push('    <span class="sector-group-icon">' + gsi.icon + '</span>');
+    parts.push('    <span class="sector-group-title">' + escHtml(gsi.label) + '</span>');
+    parts.push('    <span class="sector-group-badge secondary-sector">Secondary</span>');
+    parts.push('    <span class="sector-group-count">Top ' + grpCalls.length + ' calls</span>');
+    parts.push('  </div>');
+    parts.push('  <div class="card-grid">');
+    for (var gi2 = 0; gi2 < grpCalls.length; gi2++) {
+      parts.push(buildMiniCard(grpCalls[gi2], gi2, 'by-sector'));
+    }
+    parts.push('  </div>');
+    parts.push('</div>');
+  }
+
+  if (parts.length === 0) {
+    parts.push('<p style="color:var(--text-muted);padding:20px">No sector data available for this profile.</p>');
+  }
+
+  container.innerHTML = parts.join('\n');
+
+  // Event delegation on container
+  container.onclick = function(e) {
+    var portal = e.target.closest('.btn-portal');
+    if (portal) return;
+    var card = e.target.closest('.card[data-call-json]');
+    if (card) {
+      try {
+        var call = JSON.parse(decodeURIComponent(card.dataset.callJson));
+        showDetail(call, 'by-sector');
+      } catch(ex) { console.error('[RFI] by-sector card parse error', ex); }
+    }
+  };
+}
+
+/* ═══════════════════════════════════════════════════════════
+   buildMiniCard(call, rank, sourceView) — shared card builder
+   Used by renderBySector. Returns HTML string.
+   ═══════════════════════════════════════════════════════════ */
+function buildMiniCard(c, rank, sourceView) {
+  var m  = c.sector_match || 'none';
+  var bc = m === 'primary' ? 'var(--green)' : m === 'secondary' ? 'var(--amber)' : 'var(--text-muted)';
+  var si = sectorInfo(c.call_sector);
+  var budget = formatBudget(c);
+  var ptype  = getProjectType(c);
+  // Embed call as JSON in data attr for click handler (URL-encoded to avoid quote issues)
+  var jsonAttr = encodeURIComponent(JSON.stringify(c));
+  var p = [];
+  p.push('<div class="card" data-call-json="' + jsonAttr + '" style="border-left-color:' + bc + ';animation-delay:' + (rank * 40) + 'ms">');
+  p.push('  <div class="card-head">');
+  p.push('    <div><span class="card-id" title="' + escAttr(c.id) + '">' + escHtml(c.id) + '</span></div>');
+  p.push('    ' + scoreRingHTML(c.score, m, false));
+  p.push('  </div>');
+  p.push('  <div class="card-title" title="' + escAttr(c.title) + '">' + escHtml(c.title || '') + '</div>');
+  p.push('  <div class="card-meta">');
+  p.push('    ' + escHtml(budget) + ' · ' + escHtml(ptype) + (c.deadline ? ' · 📅 ' + escHtml(c.deadline) : ''));
+  p.push('  </div>');
+  p.push('  <div class="card-foot">');
+  p.push('    ' + statusBadge(c.status));
+  p.push('    ' + matchBadge(m));
+  if (c.deadline) p.push('<span class="badge badge-deadline">📅 ' + escHtml(c.deadline) + '</span>');
+  p.push('    <span class="badge badge-none">' + si.icon + ' ' + escHtml(si.label) + '</span>');
+  p.push('    <a class="btn-portal" href="' + portalUrl(c.id) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Portal ↗</a>');
+  p.push('  </div>');
+  p.push('</div>');
+  return p.join('\n');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   renderFullList(page) — paginated full list with sort/filter
+   ═══════════════════════════════════════════════════════════ */
+var PAGE_SIZE = 25;
+
+function _getFilteredSorted() {
+  var opp = window.state.opportunities;
+  if (!opp || !opp.all_ranked) return [];
+  var all = opp.all_ranked.slice(); // copy
+
+  // Filter by status
+  var fStatus = window.state.fullListFilterStatus;
+  if (fStatus !== 'all') {
+    all = all.filter(function(c){ return c.status === fStatus; });
+  }
+
+  // Filter by sector
+  var fSector = window.state.fullListFilterSector;
+  if (fSector !== 'all') {
+    all = all.filter(function(c){ return c.call_sector === fSector; });
+  }
+
+  // Sort
+  var sort = window.state.fullListSort;
+  if (sort === 'deadline') {
+    all.sort(function(a, b) {
+      var da = a.deadline || 'zzz', db = b.deadline || 'zzz';
+      // Parse "DD Mon YYYY" dates; unknown/missing → sort to end
+      var pa = _parseDeadline(da), pb = _parseDeadline(db);
+      return pa - pb;
+    });
+  } else if (sort === 'sector') {
+    all.sort(function(a, b) {
+      var sa = sectorInfo(a.call_sector).label, sb = sectorInfo(b.call_sector).label;
+      return sa.localeCompare(sb);
+    });
+  }
+  // 'score' keeps default order (already sorted by score desc)
+
+  return all;
+}
+
+function _parseDeadline(s) {
+  if (!s || s.length < 4 || s === 'See portal') return Infinity;
+  var d = new Date(s);
+  return isNaN(d) ? Infinity : d.getTime();
+}
+
+function renderFullList(page) {
+  var container = $('view-full-list');
+  var all = _getFilteredSorted();
+  var totalPages = Math.ceil(all.length / PAGE_SIZE);
+  page = Math.max(0, Math.min(page, totalPages - 1));
+  window.state.fullListPage = page;
+
+  var start = page * PAGE_SIZE;
+  var slice = all.slice(start, start + PAGE_SIZE);
+
+  // Collect unique sectors for filter dropdown
+  var allRaw = (window.state.opportunities && window.state.opportunities.all_ranked) || [];
+  var sectorSet = {};
+  for (var si2 = 0; si2 < allRaw.length; si2++) {
+    var sc = allRaw[si2].call_sector;
+    if (sc) sectorSet[sc] = true;
+  }
+  var sectorCodes = Object.keys(sectorSet).sort();
+
+  var parts = [];
+
+  // Controls
+  parts.push('<div class="fl-controls">');
+  parts.push('  <select class="fl-select" id="fl-sort" onchange="window.state.fullListSort=this.value;window.state.fullListPage=0;renderFullList(0)">');
+  parts.push('    <option value="score"' + (window.state.fullListSort === 'score' ? ' selected' : '') + '>Sort: Relevance</option>');
+  parts.push('    <option value="deadline"' + (window.state.fullListSort === 'deadline' ? ' selected' : '') + '>Sort: Deadline</option>');
+  parts.push('    <option value="sector"' + (window.state.fullListSort === 'sector' ? ' selected' : '') + '>Sort: Sector</option>');
+  parts.push('  </select>');
+  parts.push('  <select class="fl-select" id="fl-filter-status" onchange="window.state.fullListFilterStatus=this.value;window.state.fullListPage=0;renderFullList(0)">');
+  parts.push('    <option value="all"' + (window.state.fullListFilterStatus === 'all' ? ' selected' : '') + '>All Statuses</option>');
+  parts.push('    <option value="Abierta"' + (window.state.fullListFilterStatus === 'Abierta' ? ' selected' : '') + '>Open</option>');
+  parts.push('    <option value="Próximamente"' + (window.state.fullListFilterStatus === 'Próximamente' ? ' selected' : '') + '>Upcoming</option>');
+  parts.push('  </select>');
+  parts.push('  <select class="fl-select" id="fl-filter-sector" onchange="window.state.fullListFilterSector=this.value;window.state.fullListPage=0;renderFullList(0)">');
+  parts.push('    <option value="all"' + (window.state.fullListFilterSector === 'all' ? ' selected' : '') + '>All Sectors</option>');
+  for (var sc2 = 0; sc2 < sectorCodes.length; sc2++) {
+    var scLabel = sectorInfo(sectorCodes[sc2]).label;
+    var sel = window.state.fullListFilterSector === sectorCodes[sc2] ? ' selected' : '';
+    parts.push('    <option value="' + escAttr(sectorCodes[sc2]) + '"' + sel + '>' + escHtml(scLabel) + '</option>');
+  }
+  parts.push('  </select>');
+  parts.push('  <span class="fl-count" id="fl-count">');
+  parts.push('    Showing ' + (start + 1) + '–' + Math.min(start + PAGE_SIZE, all.length) + ' of ' + all.length + ' calls');
+  parts.push('  </span>');
+  parts.push('</div>');
+
+  // Rows
+  if (slice.length === 0) {
+    parts.push('<p style="color:var(--text-muted);font-size:.9rem;padding:20px">No calls match the current filters.</p>');
+  } else {
+    parts.push('<div class="fl-list">');
+    for (var ri = 0; ri < slice.length; ri++) {
+      var c = slice[ri];
+      var globalRank = start + ri + 1;
+      var m2 = c.sector_match || 'none';
+      var bc2 = m2 === 'primary' ? 'var(--green)' : m2 === 'secondary' ? 'var(--amber)' : 'var(--text-muted)';
+      var si3 = sectorInfo(c.call_sector);
+      var jsonAttr = encodeURIComponent(JSON.stringify(c));
+      parts.push('<div class="fl-row" data-call-json="' + jsonAttr + '">');
+      parts.push('  <span class="fl-rank">#' + globalRank + '</span>');
+      parts.push('  ' + scoreRingHTML(c.score, m2, false));
+      parts.push('  <div class="fl-title-col">');
+      parts.push('    <div class="fl-call-id">' + escHtml(c.id) + '</div>');
+      parts.push('    <div class="fl-call-title">' + escHtml(c.title || '') + '</div>');
+      parts.push('  </div>');
+      parts.push('  ' + statusBadge(c.status));
+      parts.push('  <span class="fl-sector-col">' + si3.icon + ' ' + escHtml(si3.label) + '</span>');
+      parts.push('  <span class="fl-deadline-col">' + escHtml(c.deadline || '—') + '</span>');
+      parts.push('  <span class="fl-portal-col">');
+      parts.push('    <a class="btn-portal" href="' + portalUrl(c.id) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗</a>');
+      parts.push('  </span>');
+      parts.push('</div>');
+    }
+    parts.push('</div>');
+  }
+
+  // Pagination
+  if (totalPages > 1) {
+    parts.push('<div class="fl-pagination">');
+    parts.push('<button class="fl-page-btn" onclick="renderFullList(' + (page - 1) + ')"' + (page === 0 ? ' disabled' : '') + '>‹ Prev</button>');
+    var startPage = Math.max(0, page - 2);
+    var endPage   = Math.min(totalPages - 1, page + 2);
+    if (startPage > 0)            parts.push('<span style="color:var(--text-muted);align-self:center">…</span>');
+    for (var pg = startPage; pg <= endPage; pg++) {
+      parts.push('<button class="fl-page-btn' + (pg === page ? ' active' : '') + '" onclick="renderFullList(' + pg + ')">' + (pg + 1) + '</button>');
+    }
+    if (endPage < totalPages - 1) parts.push('<span style="color:var(--text-muted);align-self:center">…</span>');
+    parts.push('<button class="fl-page-btn" onclick="renderFullList(' + (page + 1) + ')"' + (page >= totalPages - 1 ? ' disabled' : '') + '>Next ›</button>');
+    parts.push('</div>');
+  }
+
+  container.innerHTML = parts.join('\n');
+
+  // Row click delegation
+  container.onclick = function(e) {
+    var portal = e.target.closest('.btn-portal');
+    if (portal) return;
+    var row = e.target.closest('.fl-row[data-call-json]');
+    if (row) {
+      try {
+        var call = JSON.parse(decodeURIComponent(row.dataset.callJson));
+        showDetail(call, 'full-list');
+      } catch(ex) { console.error('[RFI] full-list row parse error', ex); }
+    }
+  };
+}
+
+/* ═══════════════════════════════════════════════════════════
+   5. goBack() — returns to the view we came from
    ═══════════════════════════════════════════════════════════ */
 function goBack() {
-  console.log('[RFI] goBack()');
-  window.state.currentView = 'top10';
+  console.log('[RFI] goBack() → prevView:', window.state.prevView);
+  var returnTo = window.state.prevView || 'top10';
   window.state.selectedCall = null;
   detailDiv.classList.add('hidden');
   resultsDiv.classList.remove('hidden');
   document.body.style.overflow = '';
+  // Activate correct tab without re-rendering (already rendered)
+  switchView(returnTo, false);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1286,6 +1708,14 @@ function handleAnalyze() {
 
     renderProfile();
     renderTopOpportunities();
+    // Update Full List tab label with total call count
+    var allRanked = window.state.opportunities && window.state.opportunities.all_ranked;
+    if (allRanked) {
+      var tabFL = $('tab-full-list');
+      if (tabFL) tabFL.textContent = '📋 Full List (' + allRanked.length + ')';
+    }
+    // Reset to Top 10 view (tabs already default to top10 active)
+    switchView('top10', false);
     showResults();
     console.log('[RFI] ✅ Render complete');
   }).catch(function(err) {
