@@ -1171,81 +1171,115 @@ function renderFullListItems() {
    RENDER — PANEL (v1.1)
    ═══════════════════════════════════════════════════════════ */
 function renderPanel(call) {
-  if (!call) return;
-  const m     = call.sector_match || 'none';
-  const bc    = matchColor(m);
-  const si    = sectorInfo(call.call_sector);
-  const ptype = extractProjectType(call);
-  const elig  = getEligibilityDetails(call);
-  const outcomes = extractExpectedOutcomes(call.scope);
+  console.log('[RFI] renderPanel called — call:', call ? call.id : 'NULL');
+  if (!call) { console.error('[RFI] renderPanel: call is null/undefined'); return; }
+  try {
+    // ── Safe escaped values ──────────────────────────────────
+    var safeId       = escHtml(call.id    || '');
+    var safeTitle    = escHtml(call.title || '');
+    var safeDeadline = escHtml(call.deadline || '');
 
-  const outcomesHTML = outcomes.length
-    ? `<ul class="outcomes-list">${outcomes.map(o => `<li>${o}</li>`).join('')}</ul>`
-    : `<p style="font-size:.83rem;color:var(--text-muted)">See official call document.</p>`;
+    var m     = call.sector_match || 'none';
+    var bc    = matchColor(m);
+    var si    = sectorInfo(call.call_sector);
+    var ptype = extractProjectType(call);
+    var elig  = getEligibilityDetails(call);
+    var outcomes = extractExpectedOutcomes(call.scope);
 
-  panelBody.innerHTML = `
-    <div class="panel-top">
-      <button class="panel-close" id="panel-close-btn">✕</button>
-      ${scoreRingHTML(call.score, m, true)}
-    </div>
+    var safeScope450 = escHtml(call.scope ? truncate(call.scope, 450) : 'Detailed scope available in official document.');
+    var safeCountries  = escHtml(elig.countries || '');
+    var safeTypes      = escHtml(elig.types || '');
+    var safeConsortium = escHtml(elig.consortium || '');
+    var safePtype      = escHtml(ptype || '');
+    var safeSiLabel    = escHtml(si.label || '');
+    var safeBudget     = escHtml(formatBudget(call) || '');
 
-    <div class="panel-hero" style="border-left-color:${bc}">
-      <span class="card-id">${call.id}</span>
-      <div class="panel-title">${call.title || ''}</div>
-    </div>
+    var outcomesHTML = outcomes.length
+      ? '<ul class="outcomes-list">' + outcomes.map(function(o){ return '<li>' + escHtml(o) + '</li>'; }).join('') + '</ul>'
+      : '<p style="font-size:.83rem;color:var(--text-muted)">See official call document.</p>';
 
-    <div class="panel-badges">
-      ${statusBadge(call.status)}
-      ${matchBadge(m)}
-      ${call.deadline ? `<span class="badge badge-deadline">📅 ${call.deadline}</span>` : ''}
-      <span class="badge badge-none">${si.icon} ${si.label}</span>
-    </div>
+    console.log('[RFI] renderPanel building HTML for:', safeId);
 
-    <div class="panel-section">
-      <div class="panel-section-title">Quick Reference</div>
-      <table class="info-table">
-        <tr><td>Project Type</td><td>${ptype}</td></tr>
-        <tr><td>Deadline</td><td>${call.deadline || 'See portal'}</td></tr>
-        <tr><td>Budget</td><td>${formatBudget(call)}</td></tr>
-        <tr><td>Sector</td><td>${si.icon} ${si.label}</td></tr>
-        <tr><td>Countries</td><td>${elig.countries}</td></tr>
-      </table>
-    </div>
+    var parts = [];
+    parts.push('<div class="panel-top">');
+    parts.push('<button class="panel-close" id="panel-close-btn">✕</button>');
+    parts.push(scoreRingHTML(call.score, m, true));
+    parts.push('</div>');
 
-    <div class="panel-section">
-      <div class="panel-section-title">Scope Summary</div>
-      <p style="font-size:.84rem;color:var(--text-secondary);line-height:1.65">
-        ${call.scope ? truncate(call.scope, 450) : 'Detailed scope available in official document.'}
-      </p>
-    </div>
+    parts.push('<div class="panel-hero" style="border-left-color:' + bc + '">');
+    parts.push('<span class="card-id">' + safeId + '</span>');
+    parts.push('<div class="panel-title">' + safeTitle + '</div>');
+    parts.push('</div>');
 
-    <div class="panel-section">
-      <div class="panel-section-title">Expected Outcomes</div>
-      ${outcomesHTML}
-    </div>
+    parts.push('<div class="panel-badges">');
+    parts.push(statusBadge(call.status));
+    parts.push(matchBadge(m));
+    if (call.deadline) parts.push('<span class="badge badge-deadline">📅 ' + safeDeadline + '</span>');
+    parts.push('<span class="badge badge-none">' + si.icon + ' ' + safeSiLabel + '</span>');
+    parts.push('</div>');
 
-    <div class="panel-section">
-      <div class="panel-section-title">Eligibility</div>
-      <div class="elig-rows">
-        <div class="elig-row"><span class="elig-label">Countries</span><span class="elig-value">${elig.countries}</span></div>
-        <div class="elig-row"><span class="elig-label">Org. Types</span><span class="elig-value">${elig.types}</span></div>
-        <div class="elig-row"><span class="elig-label">Consortium</span><span class="elig-value">${elig.consortium}</span></div>
-      </div>
-    </div>
+    parts.push('<div class="panel-section">');
+    parts.push('<div class="panel-section-title">Quick Reference</div>');
+    parts.push('<table class="info-table">');
+    parts.push('<tr><td>Project Type</td><td>' + safePtype + '</td></tr>');
+    parts.push('<tr><td>Deadline</td><td>' + (safeDeadline || 'See portal') + '</td></tr>');
+    parts.push('<tr><td>Budget</td><td>' + safeBudget + '</td></tr>');
+    parts.push('<tr><td>Sector</td><td>' + si.icon + ' ' + safeSiLabel + '</td></tr>');
+    parts.push('<tr><td>Countries</td><td>' + safeCountries + '</td></tr>');
+    parts.push('</table>');
+    parts.push('</div>');
 
-    <div class="panel-actions">
-      <a class="btn-portal" href="${portalUrl(call.id)}" target="_blank" rel="noopener"
-         style="flex:1;justify-content:center;padding:12px;font-size:.85rem">📄 Ver documento oficial ↗</a>
-      <button class="btn-detail" id="panel-detail-btn" style="flex:1">Ver más detalles →</button>
-    </div>
-    <div style="padding:0 24px 24px">
-      <button class="btn-close-panel" id="panel-close-btn2" style="width:100%">✕ Cerrar</button>
-    </div>
-  `;
+    parts.push('<div class="panel-section">');
+    parts.push('<div class="panel-section-title">Scope Summary</div>');
+    parts.push('<p style="font-size:.84rem;color:var(--text-secondary);line-height:1.65">' + safeScope450 + '</p>');
+    parts.push('</div>');
 
-  $('panel-close-btn').addEventListener('click', closePanel);
-  $('panel-close-btn2').addEventListener('click', closePanel);
-  $('panel-detail-btn').addEventListener('click', () => openDetail(call));
+    parts.push('<div class="panel-section">');
+    parts.push('<div class="panel-section-title">Expected Outcomes</div>');
+    parts.push(outcomesHTML);
+    parts.push('</div>');
+
+    parts.push('<div class="panel-section">');
+    parts.push('<div class="panel-section-title">Eligibility</div>');
+    parts.push('<div class="elig-rows">');
+    parts.push('<div class="elig-row"><span class="elig-label">Countries</span><span class="elig-value">' + safeCountries + '</span></div>');
+    parts.push('<div class="elig-row"><span class="elig-label">Org. Types</span><span class="elig-value">' + safeTypes + '</span></div>');
+    parts.push('<div class="elig-row"><span class="elig-label">Consortium</span><span class="elig-value">' + safeConsortium + '</span></div>');
+    parts.push('</div>');
+    parts.push('</div>');
+
+    parts.push('<div class="panel-actions">');
+    parts.push('<a class="btn-portal" href="' + portalUrl(call.id) + '" target="_blank" rel="noopener" style="flex:1;justify-content:center;padding:12px;font-size:.85rem">📄 Ver documento oficial ↗</a>');
+    parts.push('<button class="btn-detail" id="panel-detail-btn" style="flex:1">Ver más detalles →</button>');
+    parts.push('</div>');
+    parts.push('<div style="padding:0 24px 24px">');
+    parts.push('<button class="btn-close-panel" id="panel-close-btn2" style="width:100%">✕ Cerrar</button>');
+    parts.push('</div>');
+
+    panelBody.innerHTML = parts.join('\n');
+    console.log('[RFI] renderPanel innerHTML set OK');
+
+    var closeBtn  = $('panel-close-btn');
+    var closeBtn2 = $('panel-close-btn2');
+    var detailBtn = $('panel-detail-btn');
+    console.log('[RFI] panel-close-btn found:', !!closeBtn);
+    console.log('[RFI] panel-close-btn2 found:', !!closeBtn2);
+    console.log('[RFI] panel-detail-btn found:', !!detailBtn);
+
+    if (closeBtn)  closeBtn.addEventListener('click', closePanel);
+    if (closeBtn2) closeBtn2.addEventListener('click', closePanel);
+    if (detailBtn) {
+      detailBtn.addEventListener('click', function() {
+        console.log('[RFI] panel-detail-btn CLICKED — calling openDetail with call.id:', call.id);
+        openDetail(call);
+      });
+      console.log('[RFI] panel-detail-btn listener attached OK');
+    } else {
+      console.error('[RFI] panel-detail-btn NOT FOUND after setting innerHTML!');
+    }
+  } catch(err) {
+    console.error('[RFI] renderPanel FATAL ERROR:', err);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1580,10 +1614,15 @@ function closePanel() {
 }
 
 function openDetail(call) {
+  console.log('[RFI] openDetail called — call.id:', call ? call.id : 'NULL');
+  if (!call) { console.error('[RFI] openDetail: call is null'); return; }
   state.detailCall = call;
+  console.log('[RFI] openDetail: calling renderDetail...');
   renderDetail(call);
+  console.log('[RFI] openDetail: renderDetail done, showing detailPage');
   detailPage.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
+  console.log('[RFI] openDetail: detailPage visible, done');
 }
 
 function closeDetail() {
