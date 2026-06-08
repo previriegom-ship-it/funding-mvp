@@ -161,34 +161,14 @@ a:hover{text-decoration:underline}
 .sector-tag.secondary{background:var(--violet-dim);color:var(--violet);border:1px solid rgba(167,139,250,.25)}
 
 /* ═══════════════════════════════════════════════════════════
-   TABS
+   RESULTS
    ═══════════════════════════════════════════════════════════ */
-.tab-bar{
-  position:sticky;top:53px;z-index:90;
-  background:rgba(8,17,31,.92);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);
-  display:flex;gap:0;overflow-x:auto;
-  max-width:1200px;margin:0 auto;
-  padding:0 24px;
-}
-.tab-btn{
-  padding:14px 24px;background:none;border:none;
-  color:var(--text-muted);font-size:.9rem;font-weight:600;
-  cursor:pointer;border-bottom:2px solid transparent;
-  white-space:nowrap;transition:color .2s,border-color .2s;font-family:var(--font);
-}
-.tab-btn:hover{color:var(--text-secondary)}
-.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
-.tab-btn .count{
-  font-size:.72rem;background:var(--accent-dim);color:var(--accent);
-  padding:2px 8px;border-radius:10px;margin-left:6px;
-}
+.results-wrap{max-width:1200px;margin:0 auto;padding:24px}
+.section-title{font-size:1.3rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px}
 
 /* ═══════════════════════════════════════════════════════════
    CARD GRID
    ═══════════════════════════════════════════════════════════ */
-.results-wrap{max-width:1200px;margin:0 auto;padding:24px}
-.section-title{font-size:1.3rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px}
 .card-grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
@@ -225,6 +205,7 @@ a:hover{text-decoration:underline}
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
 }
 .card-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.card-meta{font-size:.82rem;color:var(--text-muted);margin-bottom:10px;line-height:1.5}
 
 /* ═══════════════════════════════════════════════════════════
    SCORE RING (CSS conic-gradient)
@@ -269,131 +250,6 @@ a:hover{text-decoration:underline}
   cursor:pointer;transition:background .2s;text-decoration:none;
 }
 .btn-portal:hover{background:rgba(0,217,255,.2);text-decoration:none}
-
-/* ═══════════════════════════════════════════════════════════
-   BY SECTOR
-   ═══════════════════════════════════════════════════════════ */
-.sector-group{margin-bottom:32px}
-.sector-header{
-  display:flex;align-items:center;gap:10px;margin-bottom:14px;
-  cursor:pointer;user-select:none;
-}
-.sector-header h3{font-size:1.05rem;font-weight:700}
-.sector-icon{font-size:1.3rem}
-.sector-chevron{
-  margin-left:auto;font-size:.8rem;color:var(--text-muted);
-  transition:transform .2s;
-}
-.sector-chevron.open{transform:rotate(180deg)}
-.sector-empty{color:var(--text-muted);font-size:.88rem;padding:12px 0}
-
-/* ═══════════════════════════════════════════════════════════
-   FULL LIST
-   ═══════════════════════════════════════════════════════════ */
-.list-controls{
-  display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;
-}
-.list-search{
-  flex:1;min-width:200px;padding:10px 16px;background:var(--bg-surface);
-  border:1px solid var(--border);border-radius:var(--radius);
-  color:var(--text);font-size:.9rem;outline:none;font-family:var(--font);
-}
-.list-search:focus{border-color:var(--accent)}
-.list-sort{
-  padding:10px 14px;background:var(--bg-surface);border:1px solid var(--border);
-  border-radius:var(--radius);color:var(--text);font-size:.85rem;
-  cursor:pointer;font-family:var(--font);
-}
-.compact-card{
-  display:flex;align-items:center;gap:14px;
-  padding:14px 18px;
-  background:var(--bg-surface);border:1px solid var(--border);
-  border-left:4px solid var(--text-muted);
-  border-radius:var(--radius);cursor:pointer;
-  transition:background .15s,transform .15s;
-  animation:fadeUp .35s ease both;
-}
-.compact-card:hover{background:var(--bg-surface-hover);transform:translateX(3px)}
-.compact-card+.compact-card{margin-top:8px}
-.compact-rank{font-size:.72rem;font-weight:700;color:var(--text-muted);min-width:28px}
-.compact-body{flex:1;min-width:0}
-.compact-id{font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--accent)}
-.compact-title{font-size:.85rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.compact-meta{display:flex;gap:8px;align-items:center;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
-.pagination{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  margin-top:24px;padding:16px 0;
-}
-.page-btn{
-  padding:8px 14px;background:var(--bg-surface);border:1px solid var(--border);
-  border-radius:var(--radius);color:var(--text-secondary);cursor:pointer;
-  font-size:.85rem;font-family:var(--font);transition:background .15s;
-}
-.page-btn:hover{background:var(--bg-surface-hover)}
-.page-btn:disabled{opacity:.3;cursor:not-allowed}
-.page-btn.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(0,217,255,.3)}
-.page-info{font-size:.82rem;color:var(--text-muted)}
-
-/* ═══════════════════════════════════════════════════════════
-   SIDE PANEL
-   ═══════════════════════════════════════════════════════════ */
-.overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.55);
-  z-index:900;opacity:0;pointer-events:none;transition:opacity .3s;
-}
-.overlay.open{opacity:1;pointer-events:auto}
-.panel{
-  position:fixed;top:0;right:0;bottom:0;width:450px;
-  background:var(--bg-surface);border-left:1px solid var(--border);
-  z-index:901;transform:translateX(100%);transition:transform .3s ease;
-  overflow-y:auto;display:flex;flex-direction:column;
-}
-.panel.open{transform:translateX(0)}
-.panel-top{
-  display:flex;align-items:flex-start;justify-content:space-between;
-  padding:24px 24px 0;
-}
-.panel-close{
-  width:36px;height:36px;display:flex;align-items:center;justify-content:center;
-  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
-  color:var(--text-muted);cursor:pointer;font-size:1.1rem;transition:color .15s;
-}
-.panel-close:hover{color:var(--text)}
-.panel-hero{
-  padding:20px 24px;border-left:5px solid var(--text-muted);margin:16px 24px 0;
-  border-radius:0 var(--radius) var(--radius) 0;
-  background:rgba(15,23,42,.5);
-}
-.panel-hero .card-id{font-size:.85rem;margin-bottom:6px;display:block}
-.panel-hero .panel-title{font-size:1.1rem;font-weight:700;line-height:1.45}
-.panel-badges{display:flex;flex-wrap:wrap;gap:8px;padding:16px 24px 0}
-.panel-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:1px;
-  background:var(--border);margin:20px 24px 0;border-radius:var(--radius);overflow:hidden;
-}
-.panel-grid-cell{background:var(--bg-surface);padding:14px 16px}
-.panel-grid-label{font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
-.panel-grid-value{font-size:.88rem;font-weight:600}
-.panel-scope{padding:20px 24px}
-.panel-scope h4{font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
-.panel-scope p{font-size:.88rem;color:var(--text-secondary);line-height:1.6}
-.panel-actions{
-  padding:20px 24px;margin-top:auto;display:flex;gap:10px;
-  border-top:1px solid var(--border);
-}
-.btn-detail{
-  flex:1;padding:12px;text-align:center;border-radius:var(--radius);
-  font-weight:700;font-size:.88rem;cursor:pointer;border:none;
-  background:linear-gradient(135deg,var(--accent),var(--violet));
-  color:#fff;transition:opacity .2s;font-family:var(--font);
-}
-.btn-detail:hover{opacity:.85}
-.btn-close-panel{
-  padding:12px 20px;border-radius:var(--radius);font-weight:600;font-size:.88rem;
-  cursor:pointer;border:1px solid var(--border);background:transparent;
-  color:var(--text-secondary);transition:background .15s;font-family:var(--font);
-}
-.btn-close-panel:hover{background:var(--bg)}
 
 /* ═══════════════════════════════════════════════════════════
    DETAIL PAGE
@@ -458,17 +314,11 @@ a:hover{text-decoration:underline}
   border-top:1px solid var(--border);
   padding:14px 24px;display:flex;align-items:center;justify-content:space-between;
 }
+.detail-section+.detail-section{border-top:1px solid var(--border);padding-top:28px}
 
 /* ═══════════════════════════════════════════════════════════
-   PANEL SECTIONS (v1.1)
+   DETAIL SECTIONS — Sub-components
    ═══════════════════════════════════════════════════════════ */
-.panel-section{border-top:1px solid var(--border);padding:16px 24px}
-.panel-section-title{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);font-weight:700;margin-bottom:10px}
-.info-table{width:100%;border-collapse:collapse}
-.info-table td{padding:6px 8px;font-size:.82rem;border-bottom:1px solid rgba(30,41,59,.6);vertical-align:top}
-.info-table td:first-child{color:var(--text-muted);width:38%;font-size:.74rem;padding-right:6px}
-.info-table td:last-child{color:var(--text-secondary);font-weight:500}
-.info-table tr:last-child td{border-bottom:none}
 .outcomes-list{list-style:none;display:flex;flex-direction:column;gap:8px}
 .outcomes-list li{font-size:.84rem;color:var(--text-secondary);line-height:1.55;padding-left:16px;position:relative}
 .outcomes-list li::before{content:'▸';position:absolute;left:0;color:var(--accent);font-size:.72rem;top:2px}
@@ -482,27 +332,14 @@ a:hover{text-decoration:underline}
 .criteria-item{display:flex;align-items:center;gap:12px}
 .criteria-name{font-size:.8rem;color:var(--text-secondary);min-width:110px;flex-shrink:0}
 .criteria-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
-.criteria-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--violet))}
+.criteria-bar{height:100%;border-radius:3px}
 .criteria-pct{font-size:.78rem;color:var(--text-muted);min-width:34px;text-align:right}
-.timeline-list{display:flex;flex-direction:column}
-.tl-item{display:flex;gap:14px;position:relative;padding-bottom:14px}
-.tl-item:last-child{padding-bottom:0}
-.tl-dot-wrap{display:flex;flex-direction:column;align-items:center;width:12px;flex-shrink:0;padding-top:3px}
-.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex-shrink:0}
-.tl-dot.muted{background:var(--border-light)}
-.tl-line{flex:1;width:2px;background:var(--border);margin-top:3px;min-height:10px}
-.tl-item:last-child .tl-line{display:none}
-.tl-label{font-size:.82rem;font-weight:600;color:var(--text)}
-.tl-date{font-size:.76rem;color:var(--text-muted)}
+.hint-text{font-size:.76rem;color:var(--text-muted);margin-top:10px;line-height:1.5}
 .doc-links{display:flex;flex-direction:column;gap:8px}
 .doc-link{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius);background:var(--bg);border:1px solid var(--border);text-decoration:none;color:var(--text-secondary);font-size:.84rem;transition:border-color .15s,color .15s}
 .doc-link:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
-.detail-section+.detail-section{border-top:1px solid var(--border);padding-top:28px}
-.hint-text{font-size:.76rem;color:var(--text-muted);margin-top:10px;line-height:1.5}
 
-/* ═══════════════════════════════════════════════════════════
-   HORIZONTAL TIMELINE (detail page v1.1)
-   ═══════════════════════════════════════════════════════════ */
+/* Horizontal Timeline */
 .tl-h{display:flex;align-items:flex-start;padding:12px 0 4px;overflow-x:auto;gap:0}
 .tl-h-step{display:flex;flex-direction:column;align-items:center;flex:1;min-width:80px}
 .tl-h-track{width:100%;display:flex;align-items:center;margin-bottom:10px}
@@ -514,9 +351,7 @@ a:hover{text-decoration:underline}
 .tl-h-label{font-size:.72rem;font-weight:600;color:var(--text);text-align:center;line-height:1.35;padding:0 4px}
 .tl-h-date{font-size:.66rem;color:var(--text-muted);text-align:center;margin-top:3px;line-height:1.3;padding:0 2px}
 
-/* ═══════════════════════════════════════════════════════════
-   WORK PACKAGES & DELIVERABLES (detail page v1.1)
-   ═══════════════════════════════════════════════════════════ */
+/* Work Packages & Deliverables */
 .wp-list,.deliv-list{display:flex;flex-direction:column;gap:8px}
 .wp-item,.deliv-item{display:flex;gap:12px;align-items:baseline;font-size:.88rem}
 .wp-num,.deliv-num{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--accent);min-width:40px;flex-shrink:0}
@@ -541,19 +376,12 @@ a:hover{text-decoration:underline}
   .input-row{flex-direction:column;border-radius:var(--radius)}
   #analyze-btn{border-radius:0 0 var(--radius) var(--radius)}
   .card-grid{grid-template-columns:1fr}
-  .panel{width:100vw}
-  .tab-bar{padding:0 12px}
-  .tab-btn{padding:12px 16px;font-size:.82rem}
   .results-wrap{padding:16px}
   .profile-bar{padding:16px}
   .site-header .tagline{display:none}
   .detail-body{padding:24px 16px 60px}
   .detail-hero h1{font-size:1.2rem}
   .detail-grid{grid-template-columns:1fr}
-  .panel-grid{grid-template-columns:1fr}
-  .compact-meta{flex-direction:column;align-items:flex-start}
-  .list-controls{flex-direction:column}
-  .list-search{min-width:unset}
 }
 </style>
 </head>
@@ -586,30 +414,18 @@ a:hover{text-decoration:underline}
 <!-- ═══ ERROR ═══ -->
 <div id="error-container"></div>
 
-<!-- ═══ RESULTS ═══ -->
-<div id="results-container" class="hidden">
+<!-- ═══ RESULTS (top 10) ═══ -->
+<div id="results" class="hidden">
   <div id="profile-bar"></div>
-  <div class="tab-bar" id="tab-bar">
-    <button class="tab-btn active" data-tab="top10">🏆 Top 10</button>
-    <button class="tab-btn" data-tab="sector">📊 By Sector</button>
-    <button class="tab-btn" data-tab="full" id="tab-full-btn">📋 Full List</button>
-  </div>
   <div class="results-wrap">
-    <div id="tab-top10"></div>
-    <div id="tab-sector" class="hidden"></div>
-    <div id="tab-full" class="hidden"></div>
+    <div class="section-title">🏆 Top 10 Opportunities</div>
+    <div class="card-grid" id="card-grid"></div>
   </div>
 </div>
 </main>
 
-<!-- ═══ PANEL OVERLAY + PANEL ═══ -->
-<div class="overlay" id="overlay"></div>
-<aside class="panel" id="panel">
-  <div id="panel-content"></div>
-</aside>
-
-<!-- ═══ DETAIL PAGE ═══ -->
-<div class="detail-page hidden" id="detail-page">
+<!-- ═══ DETAIL PAGE (full-screen overlay) ═══ -->
+<div class="detail-page hidden" id="detail">
   <div id="detail-content"></div>
 </div>
 
@@ -617,31 +433,28 @@ a:hover{text-decoration:underline}
 /* ═══════════════════════════════════════════════════════════
    CONFIG
    ═══════════════════════════════════════════════════════════ */
-const API_BASE = (() => {
-  const p = new URLSearchParams(window.location.search).get('api');
-  return (p || window.API_BASE || 'https://funding-mvp-production.up.railway.app').replace(/\/$/, '');
+var API_BASE = (function() {
+  var p = new URLSearchParams(window.location.search).get('api');
+  return (p || 'https://funding-mvp-production.up.railway.app').replace(/\/$/, '');
 })();
 
-const PORTAL_BASE = 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/';
-const PER_PAGE = 50;
+var PORTAL_BASE = 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/';
 
 /* ═══════════════════════════════════════════════════════════
    STATE
    ═══════════════════════════════════════════════════════════ */
-const state = {
+window.state = {
+  url: null,
   profile: null,
   opportunities: null,
-  allCalls: {},       // id → call lookup
-  activeTab: 'top10',
-  selectedCall: null, // panel
-  detailCall: null,   // detail page
-  fullList: { search: '', sort: 'score', page: 0 },
+  selectedCall: null,
+  currentView: 'top10'
 };
 
 /* ═══════════════════════════════════════════════════════════
    SECTOR DATA
    ═══════════════════════════════════════════════════════════ */
-const SECTOR_INFO = {
+var SECTOR_INFO = {
   DIGITAL_TECH:           { icon: '💻', label: 'Digital Technologies' },
   HEALTH_BIOMEDICAL:      { icon: '🏥', label: 'Health & Biomedical' },
   MOBILITY_TRANSPORT:     { icon: '🚗', label: 'Mobility & Transport' },
@@ -652,34 +465,43 @@ const SECTOR_INFO = {
   EDUCATION_LEARNING:     { icon: '📚', label: 'Education & Learning' },
   AGRICULTURE_FOOD:       { icon: '🌾', label: 'Agriculture & Food' },
   MATERIALS_ADVANCED:     { icon: '⚗️', label: 'Advanced Materials' },
-  UNKNOWN:                { icon: '🔬', label: 'Other Research' },
+  UNKNOWN:                { icon: '🔬', label: 'Other Research' }
 };
 
-const PROJECT_TYPES = {
+var PROJECT_TYPES = {
   RIA: 'Research & Innovation Action', IA: 'Innovation Action',
   CSA: 'Coordination & Support Action', PCP: 'Pre-Commercial Procurement',
   PPI: 'Public Procurement of Innovation', MSCA: 'Marie Curie Action',
-  EIC: 'EIC Accelerator', ERC: 'ERC Grant',
+  EIC: 'EIC Accelerator', ERC: 'ERC Grant'
 };
 
 /* ═══════════════════════════════════════════════════════════
    DOM REFS
    ═══════════════════════════════════════════════════════════ */
-const $ = id => document.getElementById(id);
-const urlInput   = $('url-input');
-const analyzeBtn = $('analyze-btn');
-const loadingSec = $('loading');
-const loadingMsg = $('loading-msg');
-const errorCtn   = $('error-container');
-const resultsCtn = $('results-container');
-const overlay    = $('overlay');
-const panel      = $('panel');
-const panelBody  = $('panel-content');
-const detailPage = $('detail-page');
-const detailBody = $('detail-content');
+function $(id) { return document.getElementById(id); }
+
+var urlInput    = $('url-input');
+var analyzeBtn  = $('analyze-btn');
+var loadingSec  = $('loading');
+var loadingMsg  = $('loading-msg');
+var errorCtn    = $('error-container');
+var resultsDiv  = $('results');
+var cardGrid    = $('card-grid');
+var detailDiv   = $('detail');
+var detailCtn   = $('detail-content');
 
 /* ═══════════════════════════════════════════════════════════
-   HELPERS
+   HELPER — ESCAPING
+   ═══════════════════════════════════════════════════════════ */
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+function escAttr(s) { return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+/* ═══════════════════════════════════════════════════════════
+   HELPER — DISPLAY
    ═══════════════════════════════════════════════════════════ */
 function portalUrl(id) { return PORTAL_BASE + encodeURIComponent(id); }
 
@@ -692,80 +514,93 @@ function matchColor(m) {
 }
 
 function matchBadge(m) {
-  const cls = m === 'primary' ? 'badge-primary' : m === 'secondary' ? 'badge-secondary' : 'badge-none';
-  const label = m === 'primary' ? 'Primary' : m === 'secondary' ? 'Secondary' : 'Low Match';
-  return `<span class="badge ${cls}">${label}</span>`;
+  var cls = m === 'primary' ? 'badge-primary' : m === 'secondary' ? 'badge-secondary' : 'badge-none';
+  var label = m === 'primary' ? 'Primary' : m === 'secondary' ? 'Secondary' : 'Low Match';
+  return '<span class="badge ' + cls + '">' + label + '</span>';
 }
 
 function statusBadge(s) {
   if (!s) return '';
-  const isOpen = s === 'Abierta';
-  const cls = isOpen ? 'badge-open' : 'badge-upcoming';
-  const lbl = isOpen ? 'Open' : 'Upcoming';
-  return `<span class="badge ${cls}">${lbl}</span>`;
+  var isOpen = s === 'Abierta';
+  var cls = isOpen ? 'badge-open' : 'badge-upcoming';
+  var lbl = isOpen ? 'Open' : 'Upcoming';
+  return '<span class="badge ' + cls + '">' + lbl + '</span>';
 }
 
 function scoreRingHTML(score, match, large) {
-  const s = Math.min(score || 0, 1);
-  const deg = (s * 360).toFixed(1);
-  const c = match === 'primary' ? 'var(--green)' : match === 'secondary' ? 'var(--amber)' : '#64748b';
-  const cls = large ? 'score-ring score-ring-lg' : 'score-ring';
-  return `<div class="${cls}" style="background:conic-gradient(${c} ${deg}deg,rgba(30,41,59,.5) ${deg}deg)">
-    <div class="score-ring-inner">${s.toFixed(2)}</div>
-  </div>`;
+  var s = Math.min(score || 0, 1);
+  var deg = (s * 360).toFixed(1);
+  var c = match === 'primary' ? 'var(--green)' : match === 'secondary' ? 'var(--amber)' : '#64748b';
+  var cls = large ? 'score-ring score-ring-lg' : 'score-ring';
+  return '<div class="' + cls + '" style="background:conic-gradient(' + c + ' ' + deg + 'deg,rgba(30,41,59,.5) ' + deg + 'deg)">' +
+    '<div class="score-ring-inner">' + s.toFixed(2) + '</div></div>';
 }
 
 function truncate(text, max) {
   if (!text) return '';
   if (text.length <= max) return text;
-  const cut = text.lastIndexOf(' ', max);
+  var cut = text.lastIndexOf(' ', max);
   return text.slice(0, cut > 0 ? cut : max) + '…';
 }
 
-function escAttr(s) { return (s||'').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
-function escHtml(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-}
-
-/* ── Project type ─────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   HELPER — PROJECT TYPE
+   ═══════════════════════════════════════════════════════════ */
 function getProjectTypeCode(call) {
-  // 1. ACTION field from API (most reliable)
-  const action = (call.action || '').toUpperCase();
+  var action = (call.action || '').toUpperCase();
   if (action) {
-    for (const code of ['RIA','IA','CSA','PCP','PPI','MSCA','EIC','ERC']) {
-      if (action.includes(code)) return code;
+    var codes = ['RIA','IA','CSA','PCP','PPI','MSCA','EIC','ERC'];
+    for (var i = 0; i < codes.length; i++) {
+      if (action.indexOf(codes[i]) !== -1) return codes[i];
     }
   }
-  // 2. Regex in call ID (e.g. HORIZON-CL3-2026-01-RIA-02)
-  const id = call.id || '';
-  const idMatch = id.match(/-(?:RIA|IA|CSA|PCP|PPI|MSCA|EIC|ERC)-/i);
+  var id = call.id || '';
+  var idMatch = id.match(/-(?:RIA|IA|CSA|PCP|PPI|MSCA|EIC|ERC)-/i);
   if (idMatch) return idMatch[0].replace(/-/g, '').toUpperCase();
-  // 3. Title patterns  "(RIA)" or "(IA)"
-  const titleMatch = (call.title || '').match(/\b(RIA|IA|CSA|PCP|PPI|MSCA|EIC|ERC)\b/i);
+  var titleMatch = (call.title || '').match(/\b(RIA|IA|CSA|PCP|PPI|MSCA|EIC|ERC)\b/i);
   if (titleMatch) return titleMatch[1].toUpperCase();
-  // 4. Scope phrases
-  const s = (call.scope || '').toLowerCase();
-  if (s.includes('research and innovation action') || s.includes('research & innovation action')) return 'RIA';
-  if (s.includes('innovation action') && !s.includes('research and innovation')) return 'IA';
-  if (s.includes('coordination and support') || s.includes('coordination & support')) return 'CSA';
-  if (s.includes('pre-commercial procurement')) return 'PCP';
+  var s = (call.scope || '').toLowerCase();
+  if (s.indexOf('research and innovation action') !== -1 || s.indexOf('research & innovation action') !== -1) return 'RIA';
+  if (s.indexOf('innovation action') !== -1 && s.indexOf('research and innovation') === -1) return 'IA';
+  if (s.indexOf('coordination and support') !== -1 || s.indexOf('coordination & support') !== -1) return 'CSA';
+  if (s.indexOf('pre-commercial procurement') !== -1) return 'PCP';
   return null;
 }
 
-function extractProjectType(call) {
-  const code = getProjectTypeCode(call);
-  if (code) return `${PROJECT_TYPES[code] || code} (${code})`;
+function getProjectType(call) {
+  var code = getProjectTypeCode(call);
+  if (code) return (PROJECT_TYPES[code] || code) + ' (' + code + ')';
   return 'Research Action';
 }
 
-/* ── Expected Outcomes extraction ────────────────────── */
-function extractExpectedOutcomes(scope, max = 5) {
+/* ═══════════════════════════════════════════════════════════
+   HELPER — BUDGET
+   ═══════════════════════════════════════════════════════════ */
+function formatBudget(call) {
+  if (call.budget && call.budget.trim()) return call.budget.trim();
+  var s = call.scope || '';
+  var m = s.match(/(?:budget|funding|grant)\s+(?:of\s+)?(?:up\s+to\s+)?(?:EUR\s*|€\s*)?([\d][0-9 ,\.]+)\s*(million|m\b|billion|k\b)?/i);
+  if (m) {
+    var n = m[1].replace(/[, ]/g,'');
+    var unit = (m[2]||'').toLowerCase();
+    if (unit.indexOf('m') === 0) return '~€' + n + 'M';
+    if (unit.indexOf('b') === 0) return '~€' + n + 'B';
+    if (unit.indexOf('k') === 0) return '~€' + n + 'K';
+    return '~€' + n;
+  }
+  return 'See official call';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HELPER — EXPECTED OUTCOMES
+   ═══════════════════════════════════════════════════════════ */
+function extractExpectedOutcomes(scope, max) {
+  if (max === undefined) max = 5;
   if (!scope) return [];
-  const outcomes = [];
-  const lines = scope.split(/[\n;]/).map(l => l.trim()).filter(l => l.length > 35 && l.length < 280);
-  for (const line of lines) {
-    const clean = line.replace(/^[-•*▸▪▷→·]\s*/, '').replace(/^\d+[.)]\s*/, '').trim();
+  var outcomes = [];
+  var lines = scope.split(/[\n;]/).map(function(l){ return l.trim(); }).filter(function(l){ return l.length > 35 && l.length < 280; });
+  for (var i = 0; i < lines.length; i++) {
+    var clean = lines[i].replace(/^[-•*▸▪▷→·]\s*/, '').replace(/^\d+[.)]\s*/, '').trim();
     if (clean.length > 35 && clean.length < 260 &&
         !/^(the\s+call|this\s+call|horizon\s|eu\s+fund|please\s|note:|important:|background:)/i.test(clean) &&
         !/^[A-Z\s]{10,}$/.test(clean)) {
@@ -773,103 +608,146 @@ function extractExpectedOutcomes(scope, max = 5) {
     }
     if (max > 0 && outcomes.length >= max) break;
   }
-  // Fallback: extract sentences
   if (outcomes.length < 2) {
-    const sents = scope.split(/(?<=[.!?])\s+/).filter(s => s.length > 45 && s.length < 260);
-    for (const s of sents.slice(1, 6)) {
-      if (!outcomes.some(o => o.slice(0, 25) === s.slice(0, 25)))
-        outcomes.push(s.trim());
+    var sents = scope.split(/(?<=[.!?])\s+/).filter(function(s){ return s.length > 45 && s.length < 260; });
+    for (var j = 1; j < Math.min(6, sents.length); j++) {
+      var isDupe = false;
+      for (var k = 0; k < outcomes.length; k++) {
+        if (outcomes[k].slice(0,25) === sents[j].slice(0,25)) { isDupe = true; break; }
+      }
+      if (!isDupe) outcomes.push(sents[j].trim());
     }
   }
   return max > 0 ? outcomes.slice(0, max) : outcomes;
 }
 
-/* ── Keyword extraction ───────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   HELPER — KEYWORD EXTRACTION
+   ═══════════════════════════════════════════════════════════ */
 function extractKeywords(scope) {
   if (!scope) return [];
-  const found = new Set();
-  // Specific tech domains to check
-  const TECH_KWS = [
+  var found = [];
+  var foundSet = {};
+  var TECH_KWS = [
     'Artificial Intelligence','Machine Learning','Deep Learning','Neural Network','Natural Language Processing',
     'Computer Vision','Cybersecurity','Blockchain','Quantum Computing','Digital Twin','Edge Computing',
     'Cloud Computing','Big Data','Autonomous Systems','Internet of Things','5G','6G',
     'Renewable Energy','Carbon Neutrality','Climate Change','Precision Agriculture','Genomics',
     'Proteomics','Smart Grid','Electric Vehicle','Autonomous Vehicle','Robotics',
     'Photonics','Semiconductors','Advanced Materials','Nanotechnology','Biotechnology',
-    'Remote Sensing','Satellite','GIS','Data Analytics','Digital Infrastructure',
+    'Remote Sensing','Satellite','GIS','Data Analytics','Digital Infrastructure'
   ];
-  const sl = scope.toLowerCase();
-  for (const kw of TECH_KWS) { if (sl.includes(kw.toLowerCase())) found.add(kw); }
-  // Multi-word capitalized phrases (2-3 words, not common phrases)
-  const skip = new Set(['The Call','This Call','This Action','Member States','European Union',
-                        'Horizon Europe','Work Programme','Project Results','Expected Outcomes']);
-  const caps = scope.match(/[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2}/g) || [];
-  for (const t of caps) {
-    if (!skip.has(t) && t.length < 40) found.add(t);
+  var sl = scope.toLowerCase();
+  for (var i = 0; i < TECH_KWS.length; i++) {
+    if (sl.indexOf(TECH_KWS[i].toLowerCase()) !== -1 && !foundSet[TECH_KWS[i]]) {
+      found.push(TECH_KWS[i]);
+      foundSet[TECH_KWS[i]] = true;
+    }
   }
-  // Uppercase acronyms (2-5 chars, filtered)
-  const skipAcro = new Set(['AND','FOR','THE','OF','IN','TO','OR','IS','BE','BY','EU','UN','THE']);
-  const acro = scope.match(/\b[A-Z]{2,5}\b/g) || [];
-  for (const a of acro) { if (!skipAcro.has(a) && !['EU','EC','HE','TRL'].includes(a)) found.add(a); }
-  return [...found].slice(0, 14);
+  var skip = {'The Call':1,'This Call':1,'This Action':1,'Member States':1,'European Union':1,
+              'Horizon Europe':1,'Work Programme':1,'Project Results':1,'Expected Outcomes':1};
+  var caps = scope.match(/[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2}/g) || [];
+  for (var j = 0; j < caps.length; j++) {
+    if (!skip[caps[j]] && caps[j].length < 40 && !foundSet[caps[j]]) {
+      found.push(caps[j]);
+      foundSet[caps[j]] = true;
+    }
+  }
+  var skipAcro = {'AND':1,'FOR':1,'THE':1,'OF':1,'IN':1,'TO':1,'OR':1,'IS':1,'BE':1,'BY':1,'EU':1,'UN':1};
+  var acro = scope.match(/\b[A-Z]{2,5}\b/g) || [];
+  for (var a = 0; a < acro.length; a++) {
+    if (!skipAcro[acro[a]] && !foundSet[acro[a]] && ['EU','EC','HE','TRL'].indexOf(acro[a]) === -1) {
+      found.push(acro[a]);
+      foundSet[acro[a]] = true;
+    }
+  }
+  return found.slice(0, 14);
 }
 
-/* ── Budget ───────────────────────────────────────────── */
-function formatBudget(call) {
-  if (call.budget && call.budget.trim()) return call.budget.trim();
-  const s = call.scope || '';
-  const m = s.match(/(?:budget|funding|grant)\s+(?:of\s+)?(?:up\s+to\s+)?(?:EUR\s*|€\s*)?([\d][0-9 ,\.]+)\s*(million|m\b|billion|k\b)?/i);
-  if (m) {
-    const n = m[1].replace(/[, ]/g,'');
-    const unit = (m[2]||'').toLowerCase();
-    if (unit.startsWith('m')) return `~€${n}M`;
-    if (unit.startsWith('b')) return `~€${n}B`;
-    if (unit.startsWith('k')) return `~€${n}K`;
-    return `~€${n}`;
+/* ═══════════════════════════════════════════════════════════
+   HELPER — WORK PACKAGES
+   ═══════════════════════════════════════════════════════════ */
+function extractWorkPackages(scope) {
+  if (!scope) return [];
+  var wps = [];
+  var m;
+  var pat1 = /\bWP\s*(\d+)\s*[:\-–]\s*([^\n;.]{8,80})/gi;
+  while ((m = pat1.exec(scope)) !== null) {
+    wps.push({ num: 'WP' + m[1], label: m[2].trim() });
   }
-  return 'See official call';
+  if (wps.length) return wps;
+  var pat2 = /Work\s+Package\s+(\d+)\s*[:\-–]\s*([^\n;.]{8,80})/gi;
+  while ((m = pat2.exec(scope)) !== null) {
+    wps.push({ num: 'WP' + m[1], label: m[2].trim() });
+  }
+  return wps;
 }
 
-/* ── Eligibility details ──────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   HELPER — DELIVERABLES
+   ═══════════════════════════════════════════════════════════ */
+function extractDeliverables(scope) {
+  if (!scope) return [];
+  var delivs = [];
+  var m;
+  var pat1 = /\bD[.\-]?(\d+)\s*[:\-–]\s*([^\n;.]{8,80})/g;
+  while ((m = pat1.exec(scope)) !== null) {
+    delivs.push({ num: 'D' + m[1], label: m[2].trim() });
+  }
+  if (delivs.length) return delivs;
+  var pat2 = /Deliverable\s+(\d+)\s*[:\-–]\s*([^\n;.]{8,80})/gi;
+  while ((m = pat2.exec(scope)) !== null) {
+    delivs.push({ num: 'D' + m[1], label: m[2].trim() });
+  }
+  return delivs;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HELPER — ELIGIBILITY
+   ═══════════════════════════════════════════════════════════ */
 function getEligibilityDetails(call) {
-  const s = (call.scope || '').toLowerCase();
-  const countries = s.includes('associated countr') ? 'EU Member States + Associated Countries'
-                  : s.includes('third countr') ? 'EU + Third Countries (conditions apply)'
-                  : 'EU Member States + Associated Countries';
-  const types = [];
-  if (s.includes('sme') || s.includes('small and medium')) types.push('SMEs');
-  if (s.includes('universit') || s.includes('academ') || s.includes('higher education')) types.push('Academia');
-  if (s.includes('research organ') || s.includes('research center') || s.includes('research institute')) types.push('Research Orgs');
-  if (s.includes('industri') || s.includes('enterprise') || s.includes('compan')) types.push('Industry');
-  if (s.includes('public bod') || s.includes('government') || s.includes('authorit') || s.includes('municipality')) types.push('Public Bodies');
-  if (s.includes('ngo') || s.includes('civil society') || s.includes('non-governmental')) types.push('NGOs');
-  const consortium = s.includes('individual') || s.includes('solo') || s.includes('single applicant') ? 'Solo applications allowed'
-                   : s.includes('single beneficiar') ? 'Single beneficiary possible'
-                   : 'Multi-partner consortium required';
+  var s = (call.scope || '').toLowerCase();
+  var countries = s.indexOf('associated countr') !== -1 ? 'EU Member States + Associated Countries'
+                : s.indexOf('third countr') !== -1 ? 'EU + Third Countries (conditions apply)'
+                : 'EU Member States + Associated Countries';
+  var types = [];
+  if (s.indexOf('sme') !== -1 || s.indexOf('small and medium') !== -1) types.push('SMEs');
+  if (s.indexOf('universit') !== -1 || s.indexOf('academ') !== -1 || s.indexOf('higher education') !== -1) types.push('Academia');
+  if (s.indexOf('research organ') !== -1 || s.indexOf('research center') !== -1 || s.indexOf('research institute') !== -1) types.push('Research Orgs');
+  if (s.indexOf('industri') !== -1 || s.indexOf('enterprise') !== -1 || s.indexOf('compan') !== -1) types.push('Industry');
+  if (s.indexOf('public bod') !== -1 || s.indexOf('government') !== -1 || s.indexOf('authorit') !== -1 || s.indexOf('municipality') !== -1) types.push('Public Bodies');
+  if (s.indexOf('ngo') !== -1 || s.indexOf('civil society') !== -1 || s.indexOf('non-governmental') !== -1) types.push('NGOs');
+  var consortium = s.indexOf('individual') !== -1 || s.indexOf('solo') !== -1 || s.indexOf('single applicant') !== -1 ? 'Solo applications allowed'
+                 : s.indexOf('single beneficiar') !== -1 ? 'Single beneficiary possible'
+                 : 'Multi-partner consortium required';
   return {
-    countries,
+    countries: countries,
     types: types.length ? types.join(', ') : 'Open to eligible entities',
-    consortium,
+    consortium: consortium
   };
 }
 
-/* ── Evaluation criteria (defaults by type) ──────────── */
+/* ═══════════════════════════════════════════════════════════
+   HELPER — EVALUATION CRITERIA
+   ═══════════════════════════════════════════════════════════ */
 function getEvaluationCriteria(call) {
-  const code = getProjectTypeCode(call);
+  var code = getProjectTypeCode(call);
   if (code === 'CSA') return { excellence: 50, impact: 30, implementation: 20 };
   if (code === 'EIC') return { excellence: 50, impact: 40, implementation: 10 };
   if (code === 'ERC') return { excellence: 100, impact: 0, implementation: 0 };
   return { excellence: 50, impact: 30, implementation: 20 };
 }
 
-/* ── Timeline ─────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   HELPER — TIMELINE
+   ═══════════════════════════════════════════════════════════ */
 function getTimeline(call) {
-  const items = [{ label: 'Opening', date: 'See Horizon Portal', muted: true }];
-  const dl = call.deadline;
+  var items = [{ label: 'Opening', date: call.opening_date || 'See Horizon Portal', muted: !call.opening_date }];
+  var dl = call.deadline;
   items.push({ label: 'Submission Deadline', date: dl || 'See Horizon Portal', muted: !dl });
   if (dl) {
-    const addMonths = (s, n) => {
-      const d = new Date(s); d.setMonth(d.getMonth() + n);
+    var addMonths = function(s, n) {
+      var d = new Date(s); d.setMonth(d.getMonth() + n);
       return d.toISOString().slice(0, 7);
     };
     items.push({ label: 'Evaluation (est.)', date: addMonths(dl, 4), muted: true });
@@ -882,418 +760,177 @@ function getTimeline(call) {
   return items;
 }
 
-/* ── Document links ───────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   HELPER — DOCUMENT LINKS
+   ═══════════════════════════════════════════════════════════ */
 function getDocLinks(call) {
-  const cid = call.id;
+  var cid = call.id;
   return [
     { icon: '🔗', label: 'Official Call — Horizon Portal', url: portalUrl(cid) },
     { icon: '📄', label: 'Application & Evaluation Guide', url: 'https://ec.europa.eu/info/funding-tenders/opportunities/docs/2021-2027/horizon/guidance/programme-guide_horizon_en.pdf' },
     { icon: '📖', label: 'Horizon Europe Work Programme', url: 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/horizon-results-platform' },
     { icon: '⚖️', label: 'Model Grant Agreement', url: 'https://ec.europa.eu/info/funding-tenders/opportunities/docs/2021-2027/common/guidance/aga_en.pdf' },
-    { icon: '🤝', label: 'Partner Search', url: `https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/partner-search;freeTextSearchKeyword=${encodeURIComponent(cid)}` },
+    { icon: '🤝', label: 'Partner Search', url: 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/partner-search;freeTextSearchKeyword=' + encodeURIComponent(cid) },
     { icon: '❓', label: 'FAQ & IT Support', url: 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/support/faq' },
-    { icon: '📧', label: 'National Contact Points (NCPs)', url: 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/support/ncp' },
+    { icon: '📧', label: 'National Contact Points (NCPs)', url: 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/support/ncp' }
   ];
 }
 
-/* ── Work Packages extraction ─────────────────────────── */
-function extractWorkPackages(scope) {
-  if (!scope) return [];
-  const wps = [];
-  for (const m of scope.matchAll(/\bWP\s*(\d+)\s*[:\-–]\s*([^\n;.]{8,80})/gi)) {
-    wps.push({ num: 'WP' + m[1], label: m[2].trim() });
-  }
-  if (wps.length) return wps;
-  for (const m of scope.matchAll(/Work\s+Package\s+(\d+)\s*[:\-–]\s*([^\n;.]{8,80})/gi)) {
-    wps.push({ num: 'WP' + m[1], label: m[2].trim() });
-  }
-  return wps;
-}
-
-/* ── Key Deliverables extraction ─────────────────────── */
-function extractDeliverables(scope) {
-  if (!scope) return [];
-  const delivs = [];
-  for (const m of scope.matchAll(/\bD[.\-]?(\d+)\s*[:\-–]\s*([^\n;.]{8,80})/g)) {
-    delivs.push({ num: 'D' + m[1], label: m[2].trim() });
-  }
-  if (delivs.length) return delivs;
-  for (const m of scope.matchAll(/Deliverable\s+(\d+)\s*[:\-–]\s*([^\n;.]{8,80})/gi)) {
-    delivs.push({ num: 'D' + m[1], label: m[2].trim() });
-  }
-  return delivs;
-}
-
-function formatDeadline(d, status) {
-  if (!d) return 'TBD';
-  const prefix = status === 'Abierta' ? 'Open until' : 'Opens';
-  return `${prefix} ${d}`;
-}
-
 /* ═══════════════════════════════════════════════════════════
-   API
+   1. analyzeGroup(url) — API call
    ═══════════════════════════════════════════════════════════ */
-async function analyzeGroup(url) {
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 120000);
-  const messages = [
+function analyzeGroup(url) {
+  console.log('[RFI] analyzeGroup called — url:', url);
+  var ctrl = new AbortController();
+  var timer = setTimeout(function(){ ctrl.abort(); }, 120000);
+  var messages = [
     'Analyzing research group…',
     'Extracting profile with AI…',
     'Classifying research sectors…',
     'Matching against 386 Horizon Europe calls…',
     'Ranking opportunities…',
-    'Almost there…',
+    'Almost there…'
   ];
-  let mi = 0;
-  const msgTimer = setInterval(() => {
+  var mi = 0;
+  var msgTimer = setInterval(function(){
     mi = Math.min(mi + 1, messages.length - 1);
     loadingMsg.textContent = messages[mi];
   }, 6000);
 
-  try {
-    console.log('[RFI] POST →', `${API_BASE}/analyze`, { url, detail_level: 'full' });
-    const res = await fetch(`${API_BASE}/analyze`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, detail_level: 'full' }),
-      signal: ctrl.signal,
-    });
+  return fetch(API_BASE + '/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url: url, detail_level: 'full' }),
+    signal: ctrl.signal
+  }).then(function(res) {
     clearTimeout(timer);
     clearInterval(msgTimer);
     console.log('[RFI] Response status:', res.status, res.statusText);
     if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body.detail || `Server error (${res.status})`);
+      return res.json().catch(function(){ return {}; }).then(function(body) {
+        throw new Error(body.detail || 'Server error (' + res.status + ')');
+      });
     }
-    const json = await res.json();
+    return res.json();
+  }).then(function(json) {
     console.log('[RFI] Response JSON top-level keys:', Object.keys(json));
+    window.state.url = url;
+    window.state.profile = json.profile || json;
+    window.state.opportunities = json.opportunities || json;
+    window.opportunitiesData = window.state.opportunities;
+    console.log('[RFI] analyzeGroup complete');
     return json;
-  } catch (err) {
+  }).catch(function(err) {
     clearTimeout(timer);
     clearInterval(msgTimer);
     if (err.name === 'AbortError') throw new Error('Request timed out. The server took too long to respond.');
     throw err;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════
-   CARD HTML
-   ═══════════════════════════════════════════════════════════ */
-function cardHTML(call, rank, delay) {
-  const m = call.sector_match || 'none';
-  const bc = m === 'primary' ? 'var(--green)' : m === 'secondary' ? 'var(--amber)' : 'var(--text-muted)';
-  return `<div class="card" data-call-id="${escAttr(call.id)}" style="border-left-color:${bc};animation-delay:${delay}ms">
-    <div class="card-head">
-      <div><span class="card-rank">#${rank}</span><span class="card-id" title="${escAttr(call.id)}">${call.id}</span></div>
-      ${scoreRingHTML(call.score, m, false)}
-    </div>
-    <div class="card-title" title="${escAttr(call.title)}">${call.title || ''}</div>
-    <div class="card-foot">
-      ${statusBadge(call.status)}
-      ${matchBadge(m)}
-      ${call.deadline ? `<span class="badge badge-deadline">📅 ${call.deadline}</span>` : ''}
-      <a class="btn-portal" href="${portalUrl(call.id)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Portal ↗</a>
-    </div>
-  </div>`;
-}
-
-function compactCardHTML(call, rank, delay) {
-  const m = call.sector_match || 'none';
-  const bc = m === 'primary' ? 'var(--green)' : m === 'secondary' ? 'var(--amber)' : 'var(--text-muted)';
-  return `<div class="compact-card" data-call-id="${escAttr(call.id)}" style="border-left-color:${bc};animation-delay:${delay}ms">
-    <span class="compact-rank">#${rank}</span>
-    ${scoreRingHTML(call.score, m, false)}
-    <div class="compact-body">
-      <div class="compact-id">${call.id}</div>
-      <div class="compact-title" title="${escAttr(call.title)}">${call.title || ''}</div>
-    </div>
-    <div class="compact-meta">
-      ${statusBadge(call.status)}
-      ${matchBadge(m)}
-      ${call.deadline ? `<span class="badge badge-deadline">📅 ${call.deadline}</span>` : ''}
-      <a class="btn-portal" href="${portalUrl(call.id)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗</a>
-    </div>
-  </div>`;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   RENDER — PROFILE
-   ═══════════════════════════════════════════════════════════ */
-function renderProfile() {
-  const p = state.profile;
-  if (!p) return;
-  const si = sectorInfo(p.primary_sector);
-  const secTags = (p.secondary_sectors || []).map(s => {
-    const code = typeof s === 'string' ? s : (s.sector || '');
-    const info = sectorInfo(code);
-    return `<span class="sector-tag secondary">${info.icon} ${info.label}</span>`;
-  }).join('');
-  $('profile-bar').innerHTML = `<div class="profile-bar">
-    <span class="profile-name">${p.name || 'Research Group'}</span>
-    <span class="sector-tag primary">${si.icon} ${si.label}</span>
-    ${secTags}
-  </div>`;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   RENDER — TOP 10
-   ═══════════════════════════════════════════════════════════ */
-function renderTop10() {
-  const calls = state.opportunities?.top_10_general || [];
-  const cards = calls.map((c, i) => cardHTML(c, i + 1, i * 50)).join('');
-  $('tab-top10').innerHTML = `
-    <div class="section-title">🏆 Top 10 Opportunities</div>
-    ${calls.length ? `<div class="card-grid">${cards}</div>` : '<p class="sector-empty">No opportunities found.</p>'}
-  `;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   RENDER — BY SECTOR
-   ═══════════════════════════════════════════════════════════ */
-function renderBySector() {
-  const bs = state.opportunities?.by_sector;
-  if (!bs) { $('tab-sector').innerHTML = ''; return; }
-
-  let html = '<div class="section-title">📊 Opportunities by Sector</div>';
-
-  // Primary
-  const pri = bs.primary || {};
-  const priInfo = sectorInfo(pri.sector_code);
-  const priCalls = pri.top_5 || [];
-  html += sectorGroupHTML(priInfo, priCalls, 'PRIMARY', true);
-
-  // Secondary
-  const sec = bs.secondary || {};
-  for (const [code, data] of Object.entries(sec)) {
-    const info = sectorInfo(code);
-    const calls = data.top_3 || [];
-    html += sectorGroupHTML(info, calls, 'SECONDARY', false);
-  }
-
-  $('tab-sector').innerHTML = html;
-  // Attach collapse toggles
-  $('tab-sector').querySelectorAll('.sector-header').forEach(h => {
-    h.addEventListener('click', () => {
-      const grid = h.nextElementSibling;
-      const chev = h.querySelector('.sector-chevron');
-      grid.classList.toggle('hidden');
-      chev.classList.toggle('open');
-    });
-  });
-}
-
-function sectorGroupHTML(info, calls, tag, startOpen) {
-  const cards = calls.map((c, i) => cardHTML(c, i + 1, i * 40)).join('');
-  return `<div class="sector-group">
-    <div class="sector-header">
-      <span class="sector-icon">${info.icon}</span>
-      <h3>${tag}: ${info.label}</h3>
-      <span class="badge ${tag === 'PRIMARY' ? 'badge-primary' : 'badge-secondary'}">${calls.length}</span>
-      <span class="sector-chevron ${startOpen ? 'open' : ''}">▼</span>
-    </div>
-    <div class="card-grid ${startOpen ? '' : 'hidden'}">
-      ${cards || '<p class="sector-empty">No calls in this sector.</p>'}
-    </div>
-  </div>`;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   RENDER — FULL LIST
-   ═══════════════════════════════════════════════════════════ */
-function renderFullList() {
-  const all = state.opportunities?.all_ranked || [];
-  $('tab-full-btn').innerHTML = `📋 Full List <span class="count">${all.length}</span>`;
-  $('tab-full').innerHTML = `
-    <div class="section-title">📋 All Opportunities (${all.length})</div>
-    <div class="list-controls">
-      <input class="list-search" id="list-search" type="text" placeholder="Search by ID or title…">
-      <select class="list-sort" id="list-sort">
-        <option value="score">Sort: Score ↓</option>
-        <option value="deadline">Sort: Deadline</option>
-        <option value="id">Sort: ID (A-Z)</option>
-      </select>
-    </div>
-    <div id="list-items"></div>
-    <div id="list-pagination"></div>
-  `;
-  $('list-search').addEventListener('input', e => { state.fullList.search = e.target.value; state.fullList.page = 0; renderFullListItems(); });
-  $('list-sort').addEventListener('change', e => { state.fullList.sort = e.target.value; state.fullList.page = 0; renderFullListItems(); });
-  renderFullListItems();
-}
-
-function renderFullListItems() {
-  const all = state.opportunities?.all_ranked || [];
-  const { search, sort, page } = state.fullList;
-
-  // Filter
-  let filtered = all;
-  if (search) {
-    const q = search.toLowerCase();
-    filtered = all.filter(c => (c.id||'').toLowerCase().includes(q) || (c.title||'').toLowerCase().includes(q));
-  }
-
-  // Sort
-  const sorted = [...filtered];
-  if (sort === 'score') sorted.sort((a, b) => (b.score||0) - (a.score||0));
-  else if (sort === 'deadline') sorted.sort((a, b) => (a.deadline||'9999').localeCompare(b.deadline||'9999'));
-  else if (sort === 'id') sorted.sort((a, b) => (a.id||'').localeCompare(b.id||''));
-
-  // Paginate
-  const totalPages = Math.max(1, Math.ceil(sorted.length / PER_PAGE));
-  const safePage = Math.min(page, totalPages - 1);
-  state.fullList.page = safePage;
-  const start = safePage * PER_PAGE;
-  const pageItems = sorted.slice(start, start + PER_PAGE);
-
-  // Render items
-  $('list-items').innerHTML = pageItems.length
-    ? pageItems.map((c, i) => compactCardHTML(c, start + i + 1, i * 20)).join('')
-    : '<p class="sector-empty">No calls match your search.</p>';
-
-  // Render pagination
-  if (sorted.length <= PER_PAGE) { $('list-pagination').innerHTML = ''; return; }
-
-  let pgHTML = `<div class="pagination">
-    <button class="page-btn" data-page="${safePage - 1}" ${safePage === 0 ? 'disabled' : ''}>← Prev</button>
-    <span class="page-info">${start + 1}–${Math.min(start + PER_PAGE, sorted.length)} of ${sorted.length}</span>
-    <button class="page-btn" data-page="${safePage + 1}" ${safePage >= totalPages - 1 ? 'disabled' : ''}>Next →</button>
-  </div>`;
-  $('list-pagination').innerHTML = pgHTML;
-  $('list-pagination').querySelectorAll('.page-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const p = parseInt(btn.dataset.page);
-      if (!isNaN(p) && p >= 0) { state.fullList.page = p; renderFullListItems(); $('tab-full').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-    });
   });
 }
 
 /* ═══════════════════════════════════════════════════════════
-   RENDER — PANEL (v1.1)
+   2. renderTopOpportunities() — Top 10 cards
    ═══════════════════════════════════════════════════════════ */
-function renderPanel(call) {
-  console.log('[RFI] renderPanel called — call:', call ? call.id : 'NULL');
-  if (!call) { console.error('[RFI] renderPanel: call is null/undefined'); return; }
+function renderTopOpportunities() {
+  console.log('[RFI] renderTopOpportunities called');
   try {
-    // ── Safe escaped values ──────────────────────────────────
-    var safeId       = escHtml(call.id    || '');
-    var safeTitle    = escHtml(call.title || '');
-    var safeDeadline = escHtml(call.deadline || '');
+    var calls = (window.state.opportunities && window.state.opportunities.top_10_general) ? window.state.opportunities.top_10_general : [];
+    console.log('[RFI] top_10_general count:', calls.length);
 
-    var m     = call.sector_match || 'none';
-    var bc    = matchColor(m);
-    var si    = sectorInfo(call.call_sector);
-    var ptype = extractProjectType(call);
-    var elig  = getEligibilityDetails(call);
-    var outcomes = extractExpectedOutcomes(call.scope);
-
-    var safeScope450 = escHtml(call.scope ? truncate(call.scope, 450) : 'Detailed scope available in official document.');
-    var safeCountries  = escHtml(elig.countries || '');
-    var safeTypes      = escHtml(elig.types || '');
-    var safeConsortium = escHtml(elig.consortium || '');
-    var safePtype      = escHtml(ptype || '');
-    var safeSiLabel    = escHtml(si.label || '');
-    var safeBudget     = escHtml(formatBudget(call) || '');
-
-    var outcomesHTML = outcomes.length
-      ? '<ul class="outcomes-list">' + outcomes.map(function(o){ return '<li>' + escHtml(o) + '</li>'; }).join('') + '</ul>'
-      : '<p style="font-size:.83rem;color:var(--text-muted)">See official call document.</p>';
-
-    console.log('[RFI] renderPanel building HTML for:', safeId);
-
-    var parts = [];
-    parts.push('<div class="panel-top">');
-    parts.push('<button class="panel-close" id="panel-close-btn">✕</button>');
-    parts.push(scoreRingHTML(call.score, m, true));
-    parts.push('</div>');
-
-    parts.push('<div class="panel-hero" style="border-left-color:' + bc + '">');
-    parts.push('<span class="card-id">' + safeId + '</span>');
-    parts.push('<div class="panel-title">' + safeTitle + '</div>');
-    parts.push('</div>');
-
-    parts.push('<div class="panel-badges">');
-    parts.push(statusBadge(call.status));
-    parts.push(matchBadge(m));
-    if (call.deadline) parts.push('<span class="badge badge-deadline">📅 ' + safeDeadline + '</span>');
-    parts.push('<span class="badge badge-none">' + si.icon + ' ' + safeSiLabel + '</span>');
-    parts.push('</div>');
-
-    parts.push('<div class="panel-section">');
-    parts.push('<div class="panel-section-title">Quick Reference</div>');
-    parts.push('<table class="info-table">');
-    parts.push('<tr><td>Project Type</td><td>' + safePtype + '</td></tr>');
-    parts.push('<tr><td>Deadline</td><td>' + (safeDeadline || 'See portal') + '</td></tr>');
-    parts.push('<tr><td>Budget</td><td>' + safeBudget + '</td></tr>');
-    parts.push('<tr><td>Sector</td><td>' + si.icon + ' ' + safeSiLabel + '</td></tr>');
-    parts.push('<tr><td>Countries</td><td>' + safeCountries + '</td></tr>');
-    parts.push('</table>');
-    parts.push('</div>');
-
-    parts.push('<div class="panel-section">');
-    parts.push('<div class="panel-section-title">Scope Summary</div>');
-    parts.push('<p style="font-size:.84rem;color:var(--text-secondary);line-height:1.65">' + safeScope450 + '</p>');
-    parts.push('</div>');
-
-    parts.push('<div class="panel-section">');
-    parts.push('<div class="panel-section-title">Expected Outcomes</div>');
-    parts.push(outcomesHTML);
-    parts.push('</div>');
-
-    parts.push('<div class="panel-section">');
-    parts.push('<div class="panel-section-title">Eligibility</div>');
-    parts.push('<div class="elig-rows">');
-    parts.push('<div class="elig-row"><span class="elig-label">Countries</span><span class="elig-value">' + safeCountries + '</span></div>');
-    parts.push('<div class="elig-row"><span class="elig-label">Org. Types</span><span class="elig-value">' + safeTypes + '</span></div>');
-    parts.push('<div class="elig-row"><span class="elig-label">Consortium</span><span class="elig-value">' + safeConsortium + '</span></div>');
-    parts.push('</div>');
-    parts.push('</div>');
-
-    parts.push('<div class="panel-actions">');
-    parts.push('<a class="btn-portal" href="' + portalUrl(call.id) + '" target="_blank" rel="noopener" style="flex:1;justify-content:center;padding:12px;font-size:.85rem">📄 Ver documento oficial ↗</a>');
-    parts.push('<button class="btn-detail" id="panel-detail-btn" style="flex:1">Ver más detalles →</button>');
-    parts.push('</div>');
-    parts.push('<div style="padding:0 24px 24px">');
-    parts.push('<button class="btn-close-panel" id="panel-close-btn2" style="width:100%">✕ Cerrar</button>');
-    parts.push('</div>');
-
-    panelBody.innerHTML = parts.join('\n');
-    console.log('[RFI] renderPanel innerHTML set OK');
-
-    var closeBtn  = $('panel-close-btn');
-    var closeBtn2 = $('panel-close-btn2');
-    var detailBtn = $('panel-detail-btn');
-    console.log('[RFI] panel-close-btn found:', !!closeBtn);
-    console.log('[RFI] panel-close-btn2 found:', !!closeBtn2);
-    console.log('[RFI] panel-detail-btn found:', !!detailBtn);
-
-    if (closeBtn)  closeBtn.addEventListener('click', closePanel);
-    if (closeBtn2) closeBtn2.addEventListener('click', closePanel);
-    if (detailBtn) {
-      detailBtn.addEventListener('click', function() {
-        console.log('[RFI] panel-detail-btn CLICKED — calling openDetail with call.id:', call.id);
-        openDetail(call);
-      });
-      console.log('[RFI] panel-detail-btn listener attached OK');
-    } else {
-      console.error('[RFI] panel-detail-btn NOT FOUND after setting innerHTML!');
+    if (calls.length === 0) {
+      cardGrid.innerHTML = '<p style="color:var(--text-muted);font-size:.92rem;padding:20px">No opportunities found. Try a different URL.</p>';
+      return;
     }
-  } catch(err) {
-    console.error('[RFI] renderPanel FATAL ERROR:', err);
+
+    var html = '';
+    for (var i = 0; i < calls.length; i++) {
+      var c = calls[i];
+      var m = c.sector_match || 'none';
+      var bc = m === 'primary' ? 'var(--green)' : m === 'secondary' ? 'var(--amber)' : 'var(--text-muted)';
+      var si = sectorInfo(c.call_sector);
+      var ptype = getProjectType(c);
+      var budget = formatBudget(c);
+
+      var parts = [];
+      parts.push('<div class="card" data-index="' + i + '" style="border-left-color:' + bc + ';animation-delay:' + (i * 50) + 'ms">');
+      parts.push('  <div class="card-head">');
+      parts.push('    <div><span class="card-rank">#' + (i + 1) + '</span><span class="card-id" title="' + escAttr(c.id) + '">' + escHtml(c.id) + '</span></div>');
+      parts.push('    ' + scoreRingHTML(c.score, m, false));
+      parts.push('  </div>');
+      parts.push('  <div class="card-title" title="' + escAttr(c.title) + '">' + escHtml(c.title || '') + '</div>');
+      parts.push('  <div class="card-meta">');
+      parts.push('    ' + escHtml(budget) + ' · ' + escHtml(ptype) + (c.deadline ? ' · 📅 ' + escHtml(c.deadline) : ''));
+      parts.push('  </div>');
+      parts.push('  <div class="card-foot">');
+      parts.push('    ' + statusBadge(c.status));
+      parts.push('    ' + matchBadge(m));
+      if (c.deadline) parts.push('<span class="badge badge-deadline">📅 ' + escHtml(c.deadline) + '</span>');
+      parts.push('    <span class="badge badge-none">' + si.icon + ' ' + escHtml(si.label) + '</span>');
+      parts.push('    <a class="btn-portal" href="' + portalUrl(c.id) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Portal ↗</a>');
+      parts.push('  </div>');
+      parts.push('</div>');
+
+      html += parts.join('\n');
+    }
+
+    cardGrid.innerHTML = html;
+
+    // Attach click handlers via delegation
+    cardGrid.onclick = function(e) {
+      var portal = e.target.closest('.btn-portal');
+      if (portal) return; // let portal link navigate
+      var card = e.target.closest('.card');
+      if (card && card.dataset.index !== undefined) {
+        var idx = parseInt(card.dataset.index, 10);
+        console.log('[RFI] Card clicked — index:', idx);
+        showDetail(idx);
+      }
+    };
+
+    console.log('[RFI] renderTopOpportunities — ' + calls.length + ' calls rendered');
+  } catch (err) {
+    console.error('[RFI] renderTopOpportunities ERROR:', err);
+    cardGrid.innerHTML = '<p style="color:var(--red)">Error rendering results: ' + escHtml(err.message) + '</p>';
   }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   RENDER — DETAIL PAGE (v1.2 — bulletproof)
+   3. showDetail(index)
    ═══════════════════════════════════════════════════════════ */
-function renderDetail(call) {
-  if (!call) { console.error('[RFI] renderDetail called with null/undefined call'); return; }
+function showDetail(index) {
+  console.log('[RFI] showDetail — index:', index);
+  try {
+    var calls = (window.state.opportunities && window.state.opportunities.top_10_general) ? window.state.opportunities.top_10_general : [];
+    var call = calls[index];
+    if (!call) { console.error('[RFI] showDetail: no call at index', index); return; }
+
+    window.state.selectedCall = call;
+    window.state.currentView = 'detail';
+
+    console.log('[RFI] showDetail — id:', call.id);
+
+    renderDetailPanel(call);
+    resultsDiv.style.display = 'none';
+    detailDiv.style.display = 'block';
+    detailDiv.scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+  } catch (err) {
+    console.error('[RFI] showDetail ERROR:', err);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   4. renderDetailPanel(call) — 10 SECTIONS
+   ═══════════════════════════════════════════════════════════ */
+function renderDetailPanel(call) {
+  if (!call) { console.error('[RFI] renderDetailPanel called with null call'); return; }
 
   try {
-    console.log('[RFI] renderDetail START — call.id:', call.id);
+    console.log('[RFI] renderDetailPanel START — call.id:', call.id);
     console.log('[RFI] call keys:', Object.keys(call).join(', '));
     console.log('[RFI] scope length:', (call.scope||'').length, '| title:', (call.title||'').slice(0,60));
 
-    // ── 0. Safe escaped values ──────────────────────────────
+    // ── Safe escaped values ──────────────────────────────────
     var safeId    = escHtml(call.id    || '');
     var safeTitle = escHtml(call.title || '');
     var safeScope = escHtml(call.scope || '');
@@ -1301,10 +938,10 @@ function renderDetail(call) {
     var m      = call.sector_match || 'none';
     var bc     = matchColor(m);
     var si     = sectorInfo(call.call_sector);
-    var ptype  = extractProjectType(call);
+    var ptype  = getProjectType(call);
     console.log('[RFI] Section 0: basics OK — ptype:', ptype, '| sector:', si.label);
 
-    // ── 1. Extract helpers (each in try/catch) ──────────────
+    // ── Extract helpers (each in try/catch) ──────────────────
     var elig     = {}; try { elig     = getEligibilityDetails(call); } catch(e) { console.error('[RFI] getEligibilityDetails error:', e); }
     var criteria = {}; try { criteria = getEvaluationCriteria(call); } catch(e) { console.error('[RFI] getEvaluationCriteria error:', e); }
     var timeline = []; try { timeline = getTimeline(call);           } catch(e) { console.error('[RFI] getTimeline error:', e); }
@@ -1317,26 +954,26 @@ function renderDetail(call) {
     console.log('[RFI] Helpers OK — outcomes:', outcomes.length, '| keywords:', keywords.length,
                 '| wps:', wps.length, '| delivs:', delivs.length);
 
-    // ── Color helper for eval bars ──────────────────────────
+    // ── Color helper for eval bars ───────────────────────────
     var barBg = function(pct) {
       return pct >= 30
         ? 'linear-gradient(90deg,var(--green),#6ee7b7)'
         : 'linear-gradient(90deg,var(--amber),#fcd34d)';
     };
 
-    // ── 2. Build 10 sections as separate strings ────────────
+    // ═══════════════════════════════════════════════════════════
+    //  BUILD HTML — 10 SECTIONS (parts.push approach)
+    // ═══════════════════════════════════════════════════════════
     var parts = [];
 
-    // HEADER (sticky back bar)
-    console.log('[RFI] Building header...');
+    // ── HEADER (sticky back bar) ─────────────────────────────
     parts.push('<div class="detail-header">');
     parts.push('  <button class="detail-back" id="detail-back-top">&larr; Back</button>');
     parts.push('  <span class="detail-header-id">' + safeId + '</span>');
     parts.push('</div>');
     parts.push('<div class="detail-body">');
 
-    // HERO
-    console.log('[RFI] Building hero...');
+    // ── HERO ─────────────────────────────────────────────────
     parts.push('<div class="detail-hero" style="border-left-color:' + bc + '">');
     parts.push('  <span class="card-id">' + safeId + '</span>');
     parts.push('  <h1>' + safeTitle + '</h1>');
@@ -1344,24 +981,24 @@ function renderDetail(call) {
     parts.push(    scoreRingHTML(call.score, m, true));
     parts.push(    statusBadge(call.status));
     parts.push(    matchBadge(m));
-    if (call.deadline) parts.push('<span class="badge badge-deadline">&#x1F4C5; ' + escHtml(call.deadline) + '</span>');
+    if (call.deadline) parts.push('<span class="badge badge-deadline">📅 ' + escHtml(call.deadline) + '</span>');
     parts.push('  </div>');
     parts.push('</div>');
 
-    // ── SECTION 1: QUICK REFERENCE ──────────────────────────
-    console.log('[RFI] Building section 1: Quick Reference...');
+    // ── SECTION 1: QUICK REFERENCE ───────────────────────────
+    console.log('[RFI] Section 1: Quick Reference ✓');
     parts.push('<div class="detail-section">');
     parts.push('  <h2>Quick Reference</h2>');
     parts.push('  <div class="detail-grid">');
     var gridCells = [
       ['Call ID',      '<span style="font-family:var(--mono);font-size:.75rem;word-break:break-all">' + safeId + '</span>'],
       ['Status',       escHtml(call.status || 'N/A')],
+      ['Opening',      escHtml(call.opening_date || 'See portal')],
       ['Deadline',     escHtml(call.deadline || 'See portal')],
       ['Project Type', escHtml(ptype)],
       ['Sector',       si.icon + ' ' + escHtml(si.label)],
       ['Match Score',  (call.score||0).toFixed(3) + ' &mdash; ' + m],
-      ['Budget',       escHtml(formatBudget(call))],
-      ['Countries',    escHtml(elig.countries || 'EU Member States + Associated Countries')],
+      ['Budget',       escHtml(formatBudget(call))]
     ];
     for (var gi = 0; gi < gridCells.length; gi++) {
       parts.push('<div class="detail-grid-cell"><div class="detail-grid-label">' + gridCells[gi][0] + '</div>');
@@ -1373,19 +1010,19 @@ function renderDetail(call) {
     // PORTAL BANNER
     parts.push('<div class="detail-portal-banner">');
     parts.push('  <a class="detail-portal-link" href="' + portalUrl(call.id) + '" target="_blank" rel="noopener">');
-    parts.push('    &#x1F517; View Official Call on Horizon Portal &nearr;');
+    parts.push('    🔗 View Official Call on Horizon Portal ↗');
     parts.push('  </a>');
     parts.push('</div>');
 
-    // ── SECTION 2: FULL SCOPE ───────────────────────────────
-    console.log('[RFI] Building section 2: Full Scope (' + safeScope.length + ' chars)...');
+    // ── SECTION 2: FULL SCOPE ────────────────────────────────
+    console.log('[RFI] Section 2: Full Scope (' + safeScope.length + ' chars) ✓');
     parts.push('<div class="detail-section">');
     parts.push('  <h2>Full Scope</h2>');
     parts.push('  <div class="detail-scope">' + (safeScope || 'No scope text available. Visit the Horizon Portal for the full call document.') + '</div>');
     parts.push('</div>');
 
-    // ── SECTION 3: EXPECTED OUTCOMES ────────────────────────
-    console.log('[RFI] Building section 3: Expected Outcomes (' + outcomes.length + ')...');
+    // ── SECTION 3: EXPECTED OUTCOMES ─────────────────────────
+    console.log('[RFI] Section 3: Expected Outcomes (' + outcomes.length + ') ✓');
     parts.push('<div class="detail-section">');
     parts.push('  <h2>Expected Outcomes</h2>');
     if (outcomes.length > 0) {
@@ -1399,8 +1036,8 @@ function renderDetail(call) {
     }
     parts.push('</div>');
 
-    // ── SECTION 4: EVALUATION CRITERIA ──────────────────────
-    console.log('[RFI] Building section 4: Evaluation Criteria...');
+    // ── SECTION 4: EVALUATION CRITERIA ───────────────────────
+    console.log('[RFI] Section 4: Evaluation Criteria ✓');
     parts.push('<div class="detail-section">');
     parts.push('  <h2>Evaluation Criteria</h2>');
     parts.push('  <div class="criteria-list">');
@@ -1426,8 +1063,8 @@ function renderDetail(call) {
     parts.push('  <p class="hint-text">Threshold: minimum ~3/5 per criterion, ~70/100 overall. Always verify in the official call document.</p>');
     parts.push('</div>');
 
-    // ── SECTION 5: RESEARCH AREAS ───────────────────────────
-    console.log('[RFI] Building section 5: Research Areas (' + keywords.length + ')...');
+    // ── SECTION 5: RESEARCH AREAS ────────────────────────────
+    console.log('[RFI] Section 5: Research Areas (' + keywords.length + ') ✓');
     parts.push('<div class="detail-section">');
     parts.push('  <h2>Research Areas</h2>');
     if (keywords.length > 0) {
@@ -1441,8 +1078,8 @@ function renderDetail(call) {
     }
     parts.push('</div>');
 
-    // ── SECTION 6: WORK PACKAGES ────────────────────────────
-    console.log('[RFI] Building section 6: Work Packages (' + wps.length + ')...');
+    // ── SECTION 6: WORK PACKAGES ─────────────────────────────
+    console.log('[RFI] Section 6: Work Packages (' + wps.length + ') ✓');
     parts.push('<div class="detail-section">');
     parts.push('  <h2>Work Packages</h2>');
     if (wps.length > 0) {
@@ -1456,8 +1093,8 @@ function renderDetail(call) {
     }
     parts.push('</div>');
 
-    // ── SECTION 7: KEY DELIVERABLES ─────────────────────────
-    console.log('[RFI] Building section 7: Key Deliverables (' + delivs.length + ')...');
+    // ── SECTION 7: KEY DELIVERABLES ──────────────────────────
+    console.log('[RFI] Section 7: Key Deliverables (' + delivs.length + ') ✓');
     parts.push('<div class="detail-section">');
     parts.push('  <h2>Key Deliverables</h2>');
     if (delivs.length > 0) {
@@ -1471,8 +1108,8 @@ function renderDetail(call) {
     }
     parts.push('</div>');
 
-    // ── SECTION 8: TIMELINE ─────────────────────────────────
-    console.log('[RFI] Building section 8: Timeline (' + timeline.length + ' items)...');
+    // ── SECTION 8: TIMELINE ──────────────────────────────────
+    console.log('[RFI] Section 8: Timeline (' + timeline.length + ' items) ✓');
     parts.push('<div class="detail-section">');
     parts.push('  <h2>Timeline</h2>');
     parts.push('  <div class="tl-h">');
@@ -1495,8 +1132,8 @@ function renderDetail(call) {
     parts.push('  <p class="hint-text">Estimated post-submission dates. Verify all dates on the Horizon Portal.</p>');
     parts.push('</div>');
 
-    // ── SECTION 9: ELIGIBILITY (DETAILED) ───────────────────
-    console.log('[RFI] Building section 9: Eligibility...');
+    // ── SECTION 9: ELIGIBILITY (DETAILED) ────────────────────
+    console.log('[RFI] Section 9: Eligibility ✓');
     parts.push('<div class="detail-section">');
     parts.push('  <h2>Eligibility (Detailed)</h2>');
     parts.push('  <div class="elig-rows">');
@@ -1505,7 +1142,7 @@ function renderDetail(call) {
       ['Org. Types',   elig.types        || 'Open to eligible entities'],
       ['Consortium',   elig.consortium   || 'Multi-partner consortium required'],
       ['Roles',        'Coordinator + Partners (check call for restrictions)'],
-      ['Restrictions', 'See official call document for country-specific conditions'],
+      ['Restrictions', 'See official call document for country-specific conditions']
     ];
     for (var ei = 0; ei < eligRows.length; ei++) {
       parts.push('<div class="elig-row"><span class="elig-label">' + eligRows[ei][0] + '</span><span class="elig-value">' + escHtml(eligRows[ei][1]) + '</span></div>');
@@ -1513,8 +1150,8 @@ function renderDetail(call) {
     parts.push('  </div>');
     parts.push('</div>');
 
-    // ── SECTION 10: DOCUMENTS & RESOURCES ───────────────────
-    console.log('[RFI] Building section 10: Documents & Resources (' + docLinks.length + ' links)...');
+    // ── SECTION 10: DOCUMENTS & RESOURCES ────────────────────
+    console.log('[RFI] Section 10: Documents & Resources (' + docLinks.length + ' links) ✓');
     parts.push('<div class="detail-section">');
     parts.push('  <h2>Documents &amp; Resources</h2>');
     parts.push('  <div class="doc-links">');
@@ -1523,7 +1160,7 @@ function renderDetail(call) {
       parts.push('<a class="doc-link" href="' + dl.url + '" target="_blank" rel="noopener">');
       parts.push('  <span style="font-size:1.1rem">' + dl.icon + '</span>');
       parts.push('  <span style="flex:1">' + escHtml(dl.label) + '</span>');
-      parts.push('  <span style="color:var(--accent);font-size:.8rem">&nearr;</span>');
+      parts.push('  <span style="color:var(--accent);font-size:.8rem">↗</span>');
       parts.push('</a>');
     }
     parts.push('  </div>');
@@ -1536,48 +1173,80 @@ function renderDetail(call) {
     parts.push('<div class="detail-footer">');
     parts.push('  <button class="detail-back" id="detail-back-bottom">&larr; Back to results</button>');
     parts.push('  <div style="display:flex;align-items:center;gap:10px">');
-    parts.push('    <a class="btn-portal" href="' + portalUrl(call.id) + '" target="_blank" rel="noopener" style="font-size:.82rem">&#x1F517; Portal &nearr;</a>');
+    parts.push('    <a class="btn-portal" href="' + portalUrl(call.id) + '" target="_blank" rel="noopener" style="font-size:.82rem">🔗 Portal ↗</a>');
     parts.push(     scoreRingHTML(call.score, m, false));
     parts.push('  </div>');
     parts.push('</div>');
 
-    // ── 3. Inject into DOM ──────────────────────────────────
+    // ── Inject into DOM ──────────────────────────────────────
     var fullHTML = parts.join('\n');
     console.log('[RFI] Total HTML length:', fullHTML.length, 'chars');
-    detailBody.innerHTML = fullHTML;
-    console.log('[RFI] innerHTML set — children:', detailBody.children.length);
+    detailCtn.innerHTML = fullHTML;
+    console.log('[RFI] innerHTML set — children:', detailCtn.children.length);
 
-    // ── 4. Attach event listeners ───────────────────────────
-    var backTop = document.getElementById('detail-back-top');
-    var backBot = document.getElementById('detail-back-bottom');
-    if (backTop) backTop.addEventListener('click', closeDetail);
-    if (backBot) backBot.addEventListener('click', closeDetail);
-    detailPage.scrollTop = 0;
+    // ── Attach event listeners ───────────────────────────────
+    var backTop = $('detail-back-top');
+    var backBot = $('detail-back-bottom');
+    if (backTop) { backTop.onclick = goBack; console.log('[RFI] detail-back-top listener attached'); }
+    if (backBot) { backBot.onclick = goBack; console.log('[RFI] detail-back-bottom listener attached'); }
 
     console.log('[RFI] ✅ Detail page rendered — 10 sections complete');
 
   } catch (err) {
-    console.error('[RFI] ❌ FATAL ERROR in renderDetail:', err);
+    console.error('[RFI] ❌ FATAL ERROR in renderDetailPanel:', err);
     console.error('[RFI] Stack:', err.stack);
-    // Show error directly in the detail page so user sees something
-    detailBody.innerHTML =
+    detailCtn.innerHTML =
       '<div style="padding:40px 24px;text-align:center">' +
       '<div style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:24px;max-width:600px;margin:0 auto">' +
       '<h2 style="color:#ef4444;margin-bottom:12px">Error rendering detail page</h2>' +
       '<p style="color:#94a3b8;margin-bottom:8px">' + escHtml(err.message) + '</p>' +
       '<p style="color:#64748b;font-size:.82rem">Check browser Console (F12) for full stack trace.</p>' +
-      '<button class="detail-back" onclick="closeDetail()" style="margin-top:16px">&larr; Back</button>' +
+      '<button class="detail-back" onclick="goBack()" style="margin-top:16px">&larr; Back</button>' +
       '</div></div>';
   }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   SHOW / HIDE
+   5. goBack()
+   ═══════════════════════════════════════════════════════════ */
+function goBack() {
+  console.log('[RFI] goBack()');
+  window.state.currentView = 'top10';
+  window.state.selectedCall = null;
+  detailDiv.style.display = 'none';
+  resultsDiv.style.display = 'block';
+  document.body.style.overflow = '';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER — PROFILE BAR
+   ═══════════════════════════════════════════════════════════ */
+function renderProfile() {
+  console.log('[RFI] renderProfile called');
+  var p = window.state.profile;
+  if (!p) return;
+  var si = sectorInfo(p.primary_sector);
+  var secTags = '';
+  var secs = p.secondary_sectors || [];
+  for (var i = 0; i < secs.length; i++) {
+    var code = typeof secs[i] === 'string' ? secs[i] : (secs[i].sector || '');
+    var info = sectorInfo(code);
+    secTags += '<span class="sector-tag secondary">' + info.icon + ' ' + escHtml(info.label) + '</span>';
+  }
+  $('profile-bar').innerHTML = '<div class="profile-bar">' +
+    '<span class="profile-name">' + escHtml(p.name || 'Research Group') + '</span>' +
+    '<span class="sector-tag primary">' + si.icon + ' ' + escHtml(si.label) + '</span>' +
+    secTags + '</div>';
+  console.log('[RFI] renderProfile done — name:', p.name);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SHOW / HIDE HELPERS
    ═══════════════════════════════════════════════════════════ */
 function showLoading() {
   loadingSec.classList.remove('hidden');
   errorCtn.innerHTML = '';
-  resultsCtn.classList.add('hidden');
+  resultsDiv.classList.add('hidden');
   loadingMsg.textContent = 'Analyzing research group…';
 }
 
@@ -1587,120 +1256,44 @@ function hideLoading() {
 
 function showError(msg) {
   hideLoading();
-  errorCtn.innerHTML = `<div class="error-box">
-    <p>${msg}</p>
-    <button onclick="document.getElementById('error-container').innerHTML='';document.getElementById('hero').scrollIntoView()">Try Again</button>
-  </div>`;
+  errorCtn.innerHTML = '<div class="error-box">' +
+    '<p>' + escHtml(msg) + '</p>' +
+    '<button onclick="document.getElementById(\'error-container\').innerHTML=\'\';document.getElementById(\'hero\').scrollIntoView()">Try Again</button>' +
+    '</div>';
 }
 
 function showResults() {
   hideLoading();
-  resultsCtn.classList.remove('hidden');
-}
-
-function openPanel(call) {
-  state.selectedCall = call;
-  renderPanel(call);
-  overlay.classList.add('open');
-  panel.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closePanel() {
-  overlay.classList.remove('open');
-  panel.classList.remove('open');
-  document.body.style.overflow = '';
-  state.selectedCall = null;
-}
-
-function openDetail(call) {
-  console.log('[RFI] openDetail called — call.id:', call ? call.id : 'NULL');
-  if (!call) { console.error('[RFI] openDetail: call is null'); return; }
-  state.detailCall = call;
-  console.log('[RFI] openDetail: calling renderDetail...');
-  renderDetail(call);
-  console.log('[RFI] openDetail: renderDetail done, showing detailPage');
-  detailPage.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-  console.log('[RFI] openDetail: detailPage visible, done');
-}
-
-function closeDetail() {
-  detailPage.classList.add('hidden');
-  state.detailCall = null;
-  // Restore body scroll only if panel is also closed
-  if (!state.selectedCall) document.body.style.overflow = '';
-}
-
-function switchTab(tab) {
-  state.activeTab = tab;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  ['top10', 'sector', 'full'].forEach(t => {
-    const el = $('tab-' + t);
-    if (el) el.classList.toggle('hidden', t !== tab);
-  });
+  resultsDiv.classList.remove('hidden');
 }
 
 /* ═══════════════════════════════════════════════════════════
-   EVENT HANDLERS
+   handleAnalyze() — main entry point
    ═══════════════════════════════════════════════════════════ */
-async function handleAnalyze() {
+function handleAnalyze() {
   console.log('[RFI] handleAnalyze() called');
-  const url = urlInput.value.trim();
+  var url = urlInput.value.trim();
   if (!url) { urlInput.focus(); return; }
   if (!/^https?:\/\/.+/i.test(url)) { showError('Invalid URL. Please enter a valid URL starting with http:// or https://'); return; }
 
   analyzeBtn.disabled = true;
   showLoading();
 
-  try {
-    console.log('[RFI] Fetching:', `${API_BASE}/analyze`, 'for URL:', url);
-    const data = await analyzeGroup(url);
+  analyzeGroup(url).then(function(data) {
+    console.log('[RFI] Data received — rendering');
+    console.log('[RFI] profile:', window.state.profile ? window.state.profile.name : 'N/A');
+    console.log('[RFI] top_10_general count:', window.state.opportunities && window.state.opportunities.top_10_general ? window.state.opportunities.top_10_general.length : 0);
 
-    console.log('[RFI] Raw data received:', data);
-    console.log('[RFI] data.profile:', data?.profile);
-    console.log('[RFI] data.opportunities keys:', data?.opportunities ? Object.keys(data.opportunities) : 'MISSING');
-    console.log('[RFI] top_10_general count:', data?.opportunities?.top_10_general?.length ?? 'MISSING');
-    console.log('[RFI] all_ranked count:', data?.opportunities?.all_ranked?.length ?? 'MISSING');
-
-    if (!data || (!data.profile && !data.opportunities)) {
-      console.error('[RFI] API response has unexpected shape:', data);
-      throw new Error('API returned unexpected data shape. Check Console for details.');
-    }
-
-    state.profile      = data.profile      || data;          // fallback if top-level
-    state.opportunities = data.opportunities || data;
-
-    // Expose to window for console debugging
-    window._rfiState = state;
-    window.opportunitiesData = state.opportunities;
-
-    console.log('[RFI] state.profile:', state.profile?.name);
-    console.log('[RFI] state.opportunities:', state.opportunities);
-
-    // Build lookup
-    state.allCalls = {};
-    const allRanked = state.opportunities?.all_ranked || [];
-    for (const c of allRanked) { state.allCalls[c.id] = c; }
-    for (const c of (state.opportunities?.top_10_general || [])) {
-      if (!state.allCalls[c.id]) state.allCalls[c.id] = c;
-    }
-    console.log('[RFI] allCalls indexed:', Object.keys(state.allCalls).length, 'calls');
-
-    console.log('[RFI] Calling render functions…');
     renderProfile();
-    renderTop10();
-    renderBySector();
-    renderFullList();
-    switchTab('top10');
+    renderTopOpportunities();
     showResults();
     console.log('[RFI] ✅ Render complete');
-  } catch (err) {
+  }).catch(function(err) {
     console.error('[RFI] ❌ Error in handleAnalyze:', err);
     showError(err.message || 'Something went wrong. Please try again.');
-  } finally {
+  }).then(function() {
     analyzeBtn.disabled = false;
-  }
+  });
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1713,41 +1306,21 @@ try {
   analyzeBtn.addEventListener('click', handleAnalyze);
 
   // Enter key
-  urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleAnalyze(); });
+  urlInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleAnalyze(); });
 
   // Example link
-  $('example-link').addEventListener('click', () => { urlInput.value = 'https://ging.github.io/'; urlInput.focus(); });
-
-  // Tab clicks
-  $('tab-bar').addEventListener('click', e => {
-    const btn = e.target.closest('.tab-btn');
-    if (btn && btn.dataset.tab) switchTab(btn.dataset.tab);
-  });
-
-  // Card clicks (event delegation on results)
-  resultsCtn.addEventListener('click', e => {
-    const card = e.target.closest('[data-call-id]');
-    if (!card) return;
-    // Don't open panel if clicking portal link
-    if (e.target.closest('.btn-portal')) return;
-    const call = state.allCalls[card.dataset.callId];
-    if (call) openPanel(call);
-  });
-
-  // Overlay click closes panel
-  overlay.addEventListener('click', closePanel);
+  $('example-link').addEventListener('click', function() { urlInput.value = 'https://ging.github.io/'; urlInput.focus(); });
 
   // Escape key
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      if (state.detailCall) closeDetail();
-      else if (state.selectedCall) closePanel();
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && window.state.currentView === 'detail') {
+      goBack();
     }
   });
 
   // URL param auto-analyze
   (function autoStart() {
-    const u = new URLSearchParams(window.location.search).get('url');
+    var u = new URLSearchParams(window.location.search).get('url');
     if (u) { urlInput.value = u; handleAnalyze(); }
   })();
 
@@ -1755,9 +1328,8 @@ try {
 } catch (initErr) {
   console.error('[RFI] INIT ERROR — this is why the button does not work:', initErr);
   document.body.insertAdjacentHTML('afterbegin',
-    `<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#ef4444;color:#fff;padding:12px 20px;font-family:monospace;font-size:.85rem">
-      ⚠️ JS Init Error: ${initErr.message} — open DevTools Console for details
-    </div>`);
+    '<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#ef4444;color:#fff;padding:12px 20px;font-family:monospace;font-size:.85rem">' +
+    '⚠️ JS Init Error: ' + initErr.message + ' — open DevTools Console for details</div>');
 }
 </script>
 </body>
