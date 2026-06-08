@@ -111,8 +111,47 @@ def classify_status(estado: str) -> str:
     return "Próximamente"
 
 
+# Hard mapping from Horizon Europe cluster prefix to sector.
+# CL2 (Culture, Creativity & Inclusive Society) is never a tech sector.
+# This overrides text-based classification for calls that mention AI/ML
+# in a cultural/social context (e.g., "AI in creative industries").
+_CLUSTER_SECTOR_OVERRIDE: dict[str, str] = {
+    "CL1":     "HEALTH_BIOMEDICAL",  # Health
+    "CL2":     "UNKNOWN",            # Culture/Creativity — never tech
+    "CL3":     "SECURITY_DEFENCE",   # Civil security, defence, disaster
+    "CL5":     "ENERGY_CLIMATE",     # Energy & Climate
+    "CL6":     "AGRICULTURE_FOOD",   # Food, Bioeconomy
+}
+
+# Non-CL prefixes that also need overrides (matched as substrings of call ID)
+_ID_SEGMENT_OVERRIDE: dict[str, str] = {
+    "EURATOM":  "UNKNOWN",           # Nuclear/radiation — not tech
+    "-MISS-":   "UNKNOWN",           # EU Missions (soil, ocean, climate) — not tech
+    "-INFRA-":  "UNKNOWN",           # Research infrastructure — generic
+    "-JU-GH-":  "HEALTH_BIOMEDICAL", # Global Health JU (EDCTP3) — not tech
+    "-HLTH-":   "HEALTH_BIOMEDICAL", # Health cluster calls
+}
+
+
 def get_call_sector(call: dict) -> str:
-    """Return the best-matching sector code for a call, or "UNKNOWN"."""
+    """Return the best-matching sector code for a call, or "UNKNOWN".
+
+    Applies a hard cluster-prefix override before text matching so that
+    CL2 (culture) calls never appear in DIGITAL_TECH results even when
+    they mention AI/ML in a social-science context.
+    """
+    call_id = call.get("ID", "") or ""
+
+    # Hard override based on call ID cluster prefix (e.g. -CL2-)
+    for cl_prefix, forced_sector in _CLUSTER_SECTOR_OVERRIDE.items():
+        if f"-{cl_prefix}-" in call_id:
+            return forced_sector
+
+    # Hard override based on free-form ID segment (EURATOM, MISS, INFRA)
+    for segment, forced_sector in _ID_SEGMENT_OVERRIDE.items():
+        if segment in call_id:
+            return forced_sector
+
     call_text = " ".join([call.get("TÍTULO", ""), call.get("SCOPE", "")])
     normalized = _normalize_text(call_text)
 
@@ -155,7 +194,11 @@ def score_call(
 
     total_profile_weight = sum(profile_weights.values()) or 1.0
     matched_weight = sum(profile_weights[t] for t in call_terms if t in profile_weights)
-    base_score = matched_weight / total_profile_weight
+
+    # Profile-coverage score: fraction of the research group's vocabulary
+    # that appears in this call.  Divide by 0.45 so that a well-matched call
+    # (covering ~45% of total profile weight) scores close to 1.0.  Capped.
+    base_score = min(1.0, matched_weight / (total_profile_weight * 0.45))
 
     sector_match = "none"
     multiplier = 0.7  # default: sector mismatch
