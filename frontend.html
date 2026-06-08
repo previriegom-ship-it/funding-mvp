@@ -723,7 +723,10 @@ function truncate(text, max) {
 }
 
 function escAttr(s) { return (s||'').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
-function escHtml(s)  { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
 
 /* ── Project type ─────────────────────────────────────── */
 function getProjectTypeCode(call) {
@@ -1246,234 +1249,292 @@ function renderPanel(call) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   RENDER — DETAIL PAGE (v1.1)
+   RENDER — DETAIL PAGE (v1.2 — bulletproof)
    ═══════════════════════════════════════════════════════════ */
 function renderDetail(call) {
-  if (!call) return;
-  const m        = call.sector_match || 'none';
-  const bc       = matchColor(m);
-  const si       = sectorInfo(call.call_sector);
-  const ptype    = extractProjectType(call);
-  const elig     = getEligibilityDetails(call);
-  const criteria = getEvaluationCriteria(call);
-  const timeline = getTimeline(call);
-  const docLinks = getDocLinks(call);
-  const outcomes = extractExpectedOutcomes(call.scope, 0);   // no cap — full list
-  const keywords = extractKeywords(call.scope);
-  const wps      = extractWorkPackages(call.scope);
-  const delivs   = extractDeliverables(call.scope);
+  if (!call) { console.error('[RFI] renderDetail called with null/undefined call'); return; }
 
-  /* ── helper: bar color (green ≥30%, amber <30%) ─── */
-  const barBg = pct => pct >= 30
-    ? 'linear-gradient(90deg,var(--green),#6ee7b7)'
-    : 'linear-gradient(90deg,var(--amber),#fcd34d)';
+  try {
+    console.log('[RFI] renderDetail START — call.id:', call.id);
+    console.log('[RFI] call keys:', Object.keys(call).join(', '));
+    console.log('[RFI] scope length:', (call.scope||'').length, '| title:', (call.title||'').slice(0,60));
 
-  // Safe escaped values for raw text injected into innerHTML
-  const safeScope  = escHtml(call.scope || '');
-  const safeTitle  = escHtml(call.title || '');
-  const safeId     = escHtml(call.id || '');
+    // ── 0. Safe escaped values ──────────────────────────────
+    var safeId    = escHtml(call.id    || '');
+    var safeTitle = escHtml(call.title || '');
+    var safeScope = escHtml(call.scope || '');
 
-  console.log('[RFI] renderDetail — call.id:', call.id);
-  console.log('[RFI] scope length:', (call.scope||'').length, 'chars');
-  console.log('[RFI] outcomes:', outcomes.length, '| keywords:', keywords.length,
-              '| wps:', wps.length, '| delivs:', delivs.length);
+    var m      = call.sector_match || 'none';
+    var bc     = matchColor(m);
+    var si     = sectorInfo(call.call_sector);
+    var ptype  = extractProjectType(call);
+    console.log('[RFI] Section 0: basics OK — ptype:', ptype, '| sector:', si.label);
 
-  /* ── Expected Outcomes ─── */
-  const outcomesHTML = outcomes.length
-    ? `<ul class="outcomes-list">${outcomes.map(o => `<li>${escHtml(o)}</li>`).join('')}</ul>`
-    : `<p style="color:var(--text-muted);font-size:.88rem">Expected outcomes available in official document.</p>`;
+    // ── 1. Extract helpers (each in try/catch) ──────────────
+    var elig     = {}; try { elig     = getEligibilityDetails(call); } catch(e) { console.error('[RFI] getEligibilityDetails error:', e); }
+    var criteria = {}; try { criteria = getEvaluationCriteria(call); } catch(e) { console.error('[RFI] getEvaluationCriteria error:', e); }
+    var timeline = []; try { timeline = getTimeline(call);           } catch(e) { console.error('[RFI] getTimeline error:', e); }
+    var docLinks = []; try { docLinks = getDocLinks(call);           } catch(e) { console.error('[RFI] getDocLinks error:', e); }
+    var outcomes = []; try { outcomes = extractExpectedOutcomes(call.scope, 0); } catch(e) { console.error('[RFI] extractExpectedOutcomes error:', e); }
+    var keywords = []; try { keywords = extractKeywords(call.scope);            } catch(e) { console.error('[RFI] extractKeywords error:', e); }
+    var wps      = []; try { wps      = extractWorkPackages(call.scope);        } catch(e) { console.error('[RFI] extractWorkPackages error:', e); }
+    var delivs   = []; try { delivs   = extractDeliverables(call.scope);        } catch(e) { console.error('[RFI] extractDeliverables error:', e); }
 
-  /* ── Keywords / Research Areas ─── */
-  const kwHTML = keywords.length
-    ? `<div class="keyword-chips">${keywords.map(k => `<span class="kw-chip">${escHtml(k)}</span>`).join('')}</div>`
-    : `<p style="color:var(--text-muted);font-size:.88rem">See official call for research areas.</p>`;
+    console.log('[RFI] Helpers OK — outcomes:', outcomes.length, '| keywords:', keywords.length,
+                '| wps:', wps.length, '| delivs:', delivs.length);
 
-  /* ── Horizontal Timeline ─── */
-  const tlHTML = `<div class="tl-h">${timeline.map((t, i) => `
-    <div class="tl-h-step">
-      <div class="tl-h-track">
-        <div class="tl-h-line${i === 0 ? ' edge' : ''}"></div>
-        <div class="tl-h-dot ${t.muted ? 'muted' : 'active'}"></div>
-        <div class="tl-h-line${i === timeline.length - 1 ? ' edge' : ''}"></div>
-      </div>
-      <div class="tl-h-label">${t.label}</div>
-      <div class="tl-h-date">${t.date}</div>
-    </div>`).join('')}</div>`;
+    // ── Color helper for eval bars ──────────────────────────
+    var barBg = function(pct) {
+      return pct >= 30
+        ? 'linear-gradient(90deg,var(--green),#6ee7b7)'
+        : 'linear-gradient(90deg,var(--amber),#fcd34d)';
+    };
 
-  /* ── Document Links ─── */
-  const dlHTML = docLinks.map(d =>
-    `<a class="doc-link" href="${d.url}" target="_blank" rel="noopener">
-      <span style="font-size:1.1rem">${d.icon}</span>
-      <span style="flex:1">${d.label}</span>
-      <span style="color:var(--accent);font-size:.8rem">↗</span>
-    </a>`).join('');
+    // ── 2. Build 10 sections as separate strings ────────────
+    var parts = [];
 
-  /* ── Evaluation Criteria (color-coded bars) ─── */
-  const critRows = criteria.excellence > 0 ? `
-    <div class="criteria-item">
-      <span class="criteria-name">Excellence</span>
-      <div class="criteria-bar-wrap"><div class="criteria-bar" style="width:${criteria.excellence}%;background:${barBg(criteria.excellence)}"></div></div>
-      <span class="criteria-pct">${criteria.excellence}%</span>
-    </div>
-    ${criteria.impact > 0 ? `<div class="criteria-item">
-      <span class="criteria-name">Impact</span>
-      <div class="criteria-bar-wrap"><div class="criteria-bar" style="width:${criteria.impact}%;background:${barBg(criteria.impact)}"></div></div>
-      <span class="criteria-pct">${criteria.impact}%</span>
-    </div>` : ''}
-    ${criteria.implementation > 0 ? `<div class="criteria-item">
-      <span class="criteria-name">Implementation</span>
-      <div class="criteria-bar-wrap"><div class="criteria-bar" style="width:${criteria.implementation}%;background:${barBg(criteria.implementation)}"></div></div>
-      <span class="criteria-pct">${criteria.implementation}%</span>
-    </div>` : ''}` : '';
+    // HEADER (sticky back bar)
+    console.log('[RFI] Building header...');
+    parts.push('<div class="detail-header">');
+    parts.push('  <button class="detail-back" id="detail-back-top">&larr; Back</button>');
+    parts.push('  <span class="detail-header-id">' + safeId + '</span>');
+    parts.push('</div>');
+    parts.push('<div class="detail-body">');
 
-  /* ── Work Packages ─── */
-  const wpHTML = wps.length
-    ? `<div class="wp-list">${wps.map(w => `<div class="wp-item"><span class="wp-num">${w.num}</span><span class="wp-label">${w.label}</span></div>`).join('')}</div>`
-    : `<p style="color:var(--text-muted);font-size:.88rem">Work package structure not specified in call text.</p>`;
+    // HERO
+    console.log('[RFI] Building hero...');
+    parts.push('<div class="detail-hero" style="border-left-color:' + bc + '">');
+    parts.push('  <span class="card-id">' + safeId + '</span>');
+    parts.push('  <h1>' + safeTitle + '</h1>');
+    parts.push('  <div class="detail-score-row">');
+    parts.push(    scoreRingHTML(call.score, m, true));
+    parts.push(    statusBadge(call.status));
+    parts.push(    matchBadge(m));
+    if (call.deadline) parts.push('<span class="badge badge-deadline">&#x1F4C5; ' + escHtml(call.deadline) + '</span>');
+    parts.push('  </div>');
+    parts.push('</div>');
 
-  /* ── Key Deliverables ─── */
-  const delivHTML = delivs.length
-    ? `<div class="deliv-list">${delivs.map(d => `<div class="deliv-item"><span class="deliv-num">${d.num}</span><span class="deliv-label">${d.label}</span></div>`).join('')}</div>`
-    : `<p style="color:var(--text-muted);font-size:.88rem">Key deliverables not specified in call text.</p>`;
+    // ── SECTION 1: QUICK REFERENCE ──────────────────────────
+    console.log('[RFI] Building section 1: Quick Reference...');
+    parts.push('<div class="detail-section">');
+    parts.push('  <h2>Quick Reference</h2>');
+    parts.push('  <div class="detail-grid">');
+    var gridCells = [
+      ['Call ID',      '<span style="font-family:var(--mono);font-size:.75rem;word-break:break-all">' + safeId + '</span>'],
+      ['Status',       escHtml(call.status || 'N/A')],
+      ['Deadline',     escHtml(call.deadline || 'See portal')],
+      ['Project Type', escHtml(ptype)],
+      ['Sector',       si.icon + ' ' + escHtml(si.label)],
+      ['Match Score',  (call.score||0).toFixed(3) + ' &mdash; ' + m],
+      ['Budget',       escHtml(formatBudget(call))],
+      ['Countries',    escHtml(elig.countries || 'EU Member States + Associated Countries')],
+    ];
+    for (var gi = 0; gi < gridCells.length; gi++) {
+      parts.push('<div class="detail-grid-cell"><div class="detail-grid-label">' + gridCells[gi][0] + '</div>');
+      parts.push('<div class="detail-grid-value">' + gridCells[gi][1] + '</div></div>');
+    }
+    parts.push('  </div>');
+    parts.push('</div>');
 
-  // Build HTML string in parts so any individual failure is visible
-  const heroSection = `
-    <div class="detail-hero" style="border-left-color:${bc}">
-      <span class="card-id">${safeId}</span>
-      <h1>${safeTitle}</h1>
-      <div class="detail-score-row">
-        ${scoreRingHTML(call.score, m, true)}
-        ${statusBadge(call.status)}
-        ${matchBadge(m)}
-        ${call.deadline ? `<span class="badge badge-deadline">📅 ${call.deadline}</span>` : ''}
-      </div>
-    </div>`;
+    // PORTAL BANNER
+    parts.push('<div class="detail-portal-banner">');
+    parts.push('  <a class="detail-portal-link" href="' + portalUrl(call.id) + '" target="_blank" rel="noopener">');
+    parts.push('    &#x1F517; View Official Call on Horizon Portal &nearr;');
+    parts.push('  </a>');
+    parts.push('</div>');
 
-  const quickRefSection = `
-    <div class="detail-section">
-      <h2>Quick Reference</h2>
-      <div class="detail-grid">
-        <div class="detail-grid-cell"><div class="detail-grid-label">Call ID</div>
-          <div class="detail-grid-value" style="font-family:var(--mono);font-size:.75rem;word-break:break-all">${safeId}</div></div>
-        <div class="detail-grid-cell"><div class="detail-grid-label">Status</div>
-          <div class="detail-grid-value">${call.status || 'N/A'}</div></div>
-        <div class="detail-grid-cell"><div class="detail-grid-label">Deadline</div>
-          <div class="detail-grid-value">${call.deadline || 'See portal'}</div></div>
-        <div class="detail-grid-cell"><div class="detail-grid-label">Project Type</div>
-          <div class="detail-grid-value">${ptype}</div></div>
-        <div class="detail-grid-cell"><div class="detail-grid-label">Sector</div>
-          <div class="detail-grid-value">${si.icon} ${si.label}</div></div>
-        <div class="detail-grid-cell"><div class="detail-grid-label">Match Score</div>
-          <div class="detail-grid-value">${(call.score||0).toFixed(3)} — ${m}</div></div>
-        <div class="detail-grid-cell"><div class="detail-grid-label">Budget</div>
-          <div class="detail-grid-value">${formatBudget(call)}</div></div>
-        <div class="detail-grid-cell"><div class="detail-grid-label">Countries</div>
-          <div class="detail-grid-value">${elig.countries}</div></div>
-      </div>
-    </div>`;
+    // ── SECTION 2: FULL SCOPE ───────────────────────────────
+    console.log('[RFI] Building section 2: Full Scope (' + safeScope.length + ' chars)...');
+    parts.push('<div class="detail-section">');
+    parts.push('  <h2>Full Scope</h2>');
+    parts.push('  <div class="detail-scope">' + (safeScope || 'No scope text available. Visit the Horizon Portal for the full call document.') + '</div>');
+    parts.push('</div>');
 
-  const scopeSection = `
-    <div class="detail-section">
-      <h2>Full Scope</h2>
-      <div class="detail-scope">${safeScope || 'No scope text available. Visit the Horizon Portal for the full call document.'}</div>
-    </div>`;
+    // ── SECTION 3: EXPECTED OUTCOMES ────────────────────────
+    console.log('[RFI] Building section 3: Expected Outcomes (' + outcomes.length + ')...');
+    parts.push('<div class="detail-section">');
+    parts.push('  <h2>Expected Outcomes</h2>');
+    if (outcomes.length > 0) {
+      parts.push('<ul class="outcomes-list">');
+      for (var oi = 0; oi < outcomes.length; oi++) {
+        parts.push('<li>' + escHtml(outcomes[oi]) + '</li>');
+      }
+      parts.push('</ul>');
+    } else {
+      parts.push('<p style="color:var(--text-muted);font-size:.88rem">Information available in official document.</p>');
+    }
+    parts.push('</div>');
 
-  console.log('[RFI] Building section HTML…');
-  console.log('[RFI] ✓ heroSection:', heroSection.length, 'chars');
-  console.log('[RFI] ✓ quickRefSection:', quickRefSection.length, 'chars');
-  console.log('[RFI] ✓ scopeSection:', scopeSection.length, 'chars');
-  console.log('[RFI] ✓ outcomesHTML:', outcomesHTML.length, 'chars');
-  console.log('[RFI] ✓ kwHTML:', kwHTML.length, 'chars');
-  console.log('[RFI] ✓ critRows:', critRows.length, 'chars');
-  console.log('[RFI] ✓ wpHTML:', wpHTML.length, 'chars');
-  console.log('[RFI] ✓ delivHTML:', delivHTML.length, 'chars');
-  console.log('[RFI] ✓ tlHTML:', tlHTML.length, 'chars');
-  console.log('[RFI] ✓ dlHTML:', dlHTML.length, 'chars');
+    // ── SECTION 4: EVALUATION CRITERIA ──────────────────────
+    console.log('[RFI] Building section 4: Evaluation Criteria...');
+    parts.push('<div class="detail-section">');
+    parts.push('  <h2>Evaluation Criteria</h2>');
+    parts.push('  <div class="criteria-list">');
+    var exc = criteria.excellence || 50;
+    var imp = criteria.impact || 30;
+    var impl = criteria.implementation || 20;
+    if (exc > 0) {
+      parts.push('<div class="criteria-item"><span class="criteria-name">Excellence</span>');
+      parts.push('<div class="criteria-bar-wrap"><div class="criteria-bar" style="width:' + exc + '%;background:' + barBg(exc) + '"></div></div>');
+      parts.push('<span class="criteria-pct">' + exc + '%</span></div>');
+    }
+    if (imp > 0) {
+      parts.push('<div class="criteria-item"><span class="criteria-name">Impact</span>');
+      parts.push('<div class="criteria-bar-wrap"><div class="criteria-bar" style="width:' + imp + '%;background:' + barBg(imp) + '"></div></div>');
+      parts.push('<span class="criteria-pct">' + imp + '%</span></div>');
+    }
+    if (impl > 0) {
+      parts.push('<div class="criteria-item"><span class="criteria-name">Implementation</span>');
+      parts.push('<div class="criteria-bar-wrap"><div class="criteria-bar" style="width:' + impl + '%;background:' + barBg(impl) + '"></div></div>');
+      parts.push('<span class="criteria-pct">' + impl + '%</span></div>');
+    }
+    parts.push('  </div>');
+    parts.push('  <p class="hint-text">Threshold: minimum ~3/5 per criterion, ~70/100 overall. Always verify in the official call document.</p>');
+    parts.push('</div>');
 
-  detailBody.innerHTML = `
-    <div class="detail-header">
-      <button class="detail-back" id="detail-back-top">← Back</button>
-      <span class="detail-header-id">${safeId}</span>
-    </div>
+    // ── SECTION 5: RESEARCH AREAS ───────────────────────────
+    console.log('[RFI] Building section 5: Research Areas (' + keywords.length + ')...');
+    parts.push('<div class="detail-section">');
+    parts.push('  <h2>Research Areas</h2>');
+    if (keywords.length > 0) {
+      parts.push('<div class="keyword-chips">');
+      for (var ki = 0; ki < keywords.length; ki++) {
+        parts.push('<span class="kw-chip">' + escHtml(keywords[ki]) + '</span>');
+      }
+      parts.push('</div>');
+    } else {
+      parts.push('<p style="color:var(--text-muted);font-size:.88rem">See full scope for research areas.</p>');
+    }
+    parts.push('</div>');
 
-    <div class="detail-body">
+    // ── SECTION 6: WORK PACKAGES ────────────────────────────
+    console.log('[RFI] Building section 6: Work Packages (' + wps.length + ')...');
+    parts.push('<div class="detail-section">');
+    parts.push('  <h2>Work Packages</h2>');
+    if (wps.length > 0) {
+      parts.push('<div class="wp-list">');
+      for (var wi = 0; wi < wps.length; wi++) {
+        parts.push('<div class="wp-item"><span class="wp-num">' + escHtml(wps[wi].num) + '</span><span class="wp-label">' + escHtml(wps[wi].label) + '</span></div>');
+      }
+      parts.push('</div>');
+    } else {
+      parts.push('<p style="color:var(--text-muted);font-size:.88rem">Work packages structure available in full call document.</p>');
+    }
+    parts.push('</div>');
 
-      ${heroSection}
+    // ── SECTION 7: KEY DELIVERABLES ─────────────────────────
+    console.log('[RFI] Building section 7: Key Deliverables (' + delivs.length + ')...');
+    parts.push('<div class="detail-section">');
+    parts.push('  <h2>Key Deliverables</h2>');
+    if (delivs.length > 0) {
+      parts.push('<div class="deliv-list">');
+      for (var di = 0; di < delivs.length; di++) {
+        parts.push('<div class="deliv-item"><span class="deliv-num">' + escHtml(delivs[di].num) + '</span><span class="deliv-label">' + escHtml(delivs[di].label) + '</span></div>');
+      }
+      parts.push('</div>');
+    } else {
+      parts.push('<p style="color:var(--text-muted);font-size:.88rem">Deliverables structure available in full call document.</p>');
+    }
+    parts.push('</div>');
 
-      ${quickRefSection}
+    // ── SECTION 8: TIMELINE ─────────────────────────────────
+    console.log('[RFI] Building section 8: Timeline (' + timeline.length + ' items)...');
+    parts.push('<div class="detail-section">');
+    parts.push('  <h2>Timeline</h2>');
+    parts.push('  <div class="tl-h">');
+    for (var ti = 0; ti < timeline.length; ti++) {
+      var t = timeline[ti];
+      var leftEdge  = (ti === 0) ? ' edge' : '';
+      var rightEdge = (ti === timeline.length - 1) ? ' edge' : '';
+      var dotClass  = t.muted ? 'muted' : 'active';
+      parts.push('<div class="tl-h-step">');
+      parts.push('  <div class="tl-h-track">');
+      parts.push('    <div class="tl-h-line' + leftEdge + '"></div>');
+      parts.push('    <div class="tl-h-dot ' + dotClass + '"></div>');
+      parts.push('    <div class="tl-h-line' + rightEdge + '"></div>');
+      parts.push('  </div>');
+      parts.push('  <div class="tl-h-label">' + escHtml(t.label) + '</div>');
+      parts.push('  <div class="tl-h-date">' + escHtml(t.date) + '</div>');
+      parts.push('</div>');
+    }
+    parts.push('  </div>');
+    parts.push('  <p class="hint-text">Estimated post-submission dates. Verify all dates on the Horizon Portal.</p>');
+    parts.push('</div>');
 
-      <div class="detail-portal-banner">
-        <a class="detail-portal-link" href="${portalUrl(call.id)}" target="_blank" rel="noopener">
-          🔗 View Official Call on Horizon Portal ↗
-        </a>
-      </div>
+    // ── SECTION 9: ELIGIBILITY (DETAILED) ───────────────────
+    console.log('[RFI] Building section 9: Eligibility...');
+    parts.push('<div class="detail-section">');
+    parts.push('  <h2>Eligibility (Detailed)</h2>');
+    parts.push('  <div class="elig-rows">');
+    var eligRows = [
+      ['Countries',    elig.countries    || 'EU Member States + Associated Countries'],
+      ['Org. Types',   elig.types        || 'Open to eligible entities'],
+      ['Consortium',   elig.consortium   || 'Multi-partner consortium required'],
+      ['Roles',        'Coordinator + Partners (check call for restrictions)'],
+      ['Restrictions', 'See official call document for country-specific conditions'],
+    ];
+    for (var ei = 0; ei < eligRows.length; ei++) {
+      parts.push('<div class="elig-row"><span class="elig-label">' + eligRows[ei][0] + '</span><span class="elig-value">' + escHtml(eligRows[ei][1]) + '</span></div>');
+    }
+    parts.push('  </div>');
+    parts.push('</div>');
 
-      ${scopeSection}
+    // ── SECTION 10: DOCUMENTS & RESOURCES ───────────────────
+    console.log('[RFI] Building section 10: Documents & Resources (' + docLinks.length + ' links)...');
+    parts.push('<div class="detail-section">');
+    parts.push('  <h2>Documents &amp; Resources</h2>');
+    parts.push('  <div class="doc-links">');
+    for (var li = 0; li < docLinks.length; li++) {
+      var dl = docLinks[li];
+      parts.push('<a class="doc-link" href="' + dl.url + '" target="_blank" rel="noopener">');
+      parts.push('  <span style="font-size:1.1rem">' + dl.icon + '</span>');
+      parts.push('  <span style="flex:1">' + escHtml(dl.label) + '</span>');
+      parts.push('  <span style="color:var(--accent);font-size:.8rem">&nearr;</span>');
+      parts.push('</a>');
+    }
+    parts.push('  </div>');
+    parts.push('</div>');
 
-      <div class="detail-section">
-        <h2>Expected Outcomes</h2>
-        ${outcomesHTML}
-      </div>
+    // Close detail-body
+    parts.push('</div>');
 
-      <div class="detail-section">
-        <h2>Research Areas</h2>
-        ${kwHTML}
-      </div>
+    // FOOTER
+    parts.push('<div class="detail-footer">');
+    parts.push('  <button class="detail-back" id="detail-back-bottom">&larr; Back to results</button>');
+    parts.push('  <div style="display:flex;align-items:center;gap:10px">');
+    parts.push('    <a class="btn-portal" href="' + portalUrl(call.id) + '" target="_blank" rel="noopener" style="font-size:.82rem">&#x1F517; Portal &nearr;</a>');
+    parts.push(     scoreRingHTML(call.score, m, false));
+    parts.push('  </div>');
+    parts.push('</div>');
 
-      <div class="detail-section">
-        <h2>Evaluation Criteria</h2>
-        <div class="criteria-list">${critRows || '<p style="color:var(--text-muted);font-size:.88rem">See official call document.</p>'}</div>
-        <p class="hint-text">Threshold: 3/5 per criterion (typical). Overall minimum ~70/100. Always verify in the official call document.</p>
-      </div>
+    // ── 3. Inject into DOM ──────────────────────────────────
+    var fullHTML = parts.join('\n');
+    console.log('[RFI] Total HTML length:', fullHTML.length, 'chars');
+    detailBody.innerHTML = fullHTML;
+    console.log('[RFI] innerHTML set — children:', detailBody.children.length);
 
-      <div class="detail-section">
-        <h2>Work Packages</h2>
-        ${wpHTML}
-      </div>
+    // ── 4. Attach event listeners ───────────────────────────
+    var backTop = document.getElementById('detail-back-top');
+    var backBot = document.getElementById('detail-back-bottom');
+    if (backTop) backTop.addEventListener('click', closeDetail);
+    if (backBot) backBot.addEventListener('click', closeDetail);
+    detailPage.scrollTop = 0;
 
-      <div class="detail-section">
-        <h2>Key Deliverables</h2>
-        ${delivHTML}
-      </div>
+    console.log('[RFI] ✅ Detail page rendered — 10 sections complete');
 
-      <div class="detail-section">
-        <h2>Timeline</h2>
-        ${tlHTML}
-        <p class="hint-text">Estimated post-submission dates. Verify all dates on the Horizon Portal.</p>
-      </div>
-
-      <div class="detail-section">
-        <h2>Eligibility (Detailed)</h2>
-        <div class="elig-rows">
-          <div class="elig-row"><span class="elig-label">Countries</span><span class="elig-value">${elig.countries}</span></div>
-          <div class="elig-row"><span class="elig-label">Org. Types</span><span class="elig-value">${elig.types}</span></div>
-          <div class="elig-row"><span class="elig-label">Consortium</span><span class="elig-value">${elig.consortium}</span></div>
-          <div class="elig-row"><span class="elig-label">Roles</span><span class="elig-value">Coordinator + Partners (check call for restrictions)</span></div>
-          <div class="elig-row"><span class="elig-label">Restrictions</span><span class="elig-value">See official call document for country-specific conditions</span></div>
-        </div>
-      </div>
-
-      <div class="detail-section">
-        <h2>Documents &amp; Resources</h2>
-        <div class="doc-links">${dlHTML}</div>
-      </div>
-
-    </div>
-
-    <div class="detail-footer">
-      <button class="detail-back" id="detail-back-bottom">← Back to results</button>
-      <div style="display:flex;align-items:center;gap:10px">
-        <a class="btn-portal" href="${portalUrl(call.id)}" target="_blank" rel="noopener" style="font-size:.82rem">🔗 Portal ↗</a>
-        ${scoreRingHTML(call.score, m, false)}
-      </div>
-    </div>
-  `;
-
-  console.log('[RFI] ✅ detailBody.innerHTML set —', detailBody.children.length, 'top-level children');
-
-  $('detail-back-top').addEventListener('click', closeDetail);
-  $('detail-back-bottom').addEventListener('click', closeDetail);
-  detailPage.scrollTop = 0;
+  } catch (err) {
+    console.error('[RFI] ❌ FATAL ERROR in renderDetail:', err);
+    console.error('[RFI] Stack:', err.stack);
+    // Show error directly in the detail page so user sees something
+    detailBody.innerHTML =
+      '<div style="padding:40px 24px;text-align:center">' +
+      '<div style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:24px;max-width:600px;margin:0 auto">' +
+      '<h2 style="color:#ef4444;margin-bottom:12px">Error rendering detail page</h2>' +
+      '<p style="color:#94a3b8;margin-bottom:8px">' + escHtml(err.message) + '</p>' +
+      '<p style="color:#64748b;font-size:.82rem">Check browser Console (F12) for full stack trace.</p>' +
+      '<button class="detail-back" onclick="closeDetail()" style="margin-top:16px">&larr; Back</button>' +
+      '</div></div>';
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
