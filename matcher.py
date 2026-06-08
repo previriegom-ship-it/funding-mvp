@@ -12,6 +12,7 @@ scores calls against it, and returns results in one of four detail levels:
 import json
 import re
 from sector_mapping import SECTORS, _normalize_text
+from extractor import enrich_call
 from logger import get_logger
 
 logger = get_logger("matcher")
@@ -241,18 +242,25 @@ def _score_all_raw(
         call_sector = get_call_sector(call)
         tallies[sector_match] += 1
 
-        scored.append({
-            "id":           call.get("ID", "?"),
-            "title":        call.get("TÍTULO", ""),
+        # Build base result, then enrich with structured extraction
+        base = {
+            "ID":           call.get("ID", "?"),
+            "TÍTULO":       call.get("TÍTULO", ""),
+            "ESTADO":       status,
+            "DEADLINE":     call.get("DEADLINE", ""),
+            "SCOPE":        call.get("SCOPE", ""),
+            "ACTION":       call.get("ACTION", ""),
+            "BUDGET":       call.get("BUDGET", ""),
+            "CLUSTER":      call.get("CLUSTER", ""),
+            # Pass through computed fields for enrichment
+            "score":        score,
             "status":       status,
             "deadline":     call.get("DEADLINE", ""),
-            "score":        score,
             "sector_match": sector_match,
             "call_sector":  call_sector,
-            "scope":        call.get("SCOPE", ""),
-            "action":       call.get("ACTION", ""),
-            "budget":       call.get("BUDGET", ""),
-        })
+        }
+        enriched = enrich_call(base)
+        scored.append(enriched)
 
     if closed_count:
         logger.debug(f"Skipped {closed_count} closed calls")
