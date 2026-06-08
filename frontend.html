@@ -501,6 +501,28 @@ a:hover{text-decoration:underline}
 .hint-text{font-size:.76rem;color:var(--text-muted);margin-top:10px;line-height:1.5}
 
 /* ═══════════════════════════════════════════════════════════
+   HORIZONTAL TIMELINE (detail page v1.1)
+   ═══════════════════════════════════════════════════════════ */
+.tl-h{display:flex;align-items:flex-start;padding:12px 0 4px;overflow-x:auto;gap:0}
+.tl-h-step{display:flex;flex-direction:column;align-items:center;flex:1;min-width:80px}
+.tl-h-track{width:100%;display:flex;align-items:center;margin-bottom:10px}
+.tl-h-line{flex:1;height:2px;background:var(--border)}
+.tl-h-line.edge{background:transparent}
+.tl-h-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0}
+.tl-h-dot.active{background:var(--accent);box-shadow:0 0 8px rgba(0,217,255,.35)}
+.tl-h-dot.muted{background:var(--border-light)}
+.tl-h-label{font-size:.72rem;font-weight:600;color:var(--text);text-align:center;line-height:1.35;padding:0 4px}
+.tl-h-date{font-size:.66rem;color:var(--text-muted);text-align:center;margin-top:3px;line-height:1.3;padding:0 2px}
+
+/* ═══════════════════════════════════════════════════════════
+   WORK PACKAGES & DELIVERABLES (detail page v1.1)
+   ═══════════════════════════════════════════════════════════ */
+.wp-list,.deliv-list{display:flex;flex-direction:column;gap:8px}
+.wp-item,.deliv-item{display:flex;gap:12px;align-items:baseline;font-size:.88rem}
+.wp-num,.deliv-num{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--accent);min-width:40px;flex-shrink:0}
+.wp-label,.deliv-label{color:var(--text-secondary);line-height:1.5}
+
+/* ═══════════════════════════════════════════════════════════
    ANIMATIONS
    ═══════════════════════════════════════════════════════════ */
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -734,7 +756,7 @@ function extractProjectType(call) {
 }
 
 /* ── Expected Outcomes extraction ────────────────────── */
-function extractExpectedOutcomes(scope) {
+function extractExpectedOutcomes(scope, max = 5) {
   if (!scope) return [];
   const outcomes = [];
   const lines = scope.split(/[\n;]/).map(l => l.trim()).filter(l => l.length > 35 && l.length < 280);
@@ -745,7 +767,7 @@ function extractExpectedOutcomes(scope) {
         !/^[A-Z\s]{10,}$/.test(clean)) {
       outcomes.push(clean.charAt(0).toUpperCase() + clean.slice(1));
     }
-    if (outcomes.length >= 5) break;
+    if (max > 0 && outcomes.length >= max) break;
   }
   // Fallback: extract sentences
   if (outcomes.length < 2) {
@@ -755,7 +777,7 @@ function extractExpectedOutcomes(scope) {
         outcomes.push(s.trim());
     }
   }
-  return outcomes.slice(0, 5);
+  return max > 0 ? outcomes.slice(0, max) : outcomes;
 }
 
 /* ── Keyword extraction ───────────────────────────────── */
@@ -858,12 +880,44 @@ function getTimeline(call) {
 
 /* ── Document links ───────────────────────────────────── */
 function getDocLinks(call) {
+  const cid = call.id;
   return [
-    { icon: '📄', label: 'Official Call on Horizon Portal', url: portalUrl(call.id) },
-    { icon: '🤝', label: 'Partner Search (F&T Portal)', url: `https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/partner-search;freeTextSearchKeyword=${encodeURIComponent(call.id)}` },
-    { icon: '📋', label: 'Horizon Europe Work Programme', url: 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/horizon-results-platform' },
-    { icon: '❓', label: 'FAQ & Support', url: 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/support/faq' },
+    { icon: '🔗', label: 'Official Call — Horizon Portal', url: portalUrl(cid) },
+    { icon: '📄', label: 'Application & Evaluation Guide', url: 'https://ec.europa.eu/info/funding-tenders/opportunities/docs/2021-2027/horizon/guidance/programme-guide_horizon_en.pdf' },
+    { icon: '📖', label: 'Horizon Europe Work Programme', url: 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/horizon-results-platform' },
+    { icon: '⚖️', label: 'Model Grant Agreement', url: 'https://ec.europa.eu/info/funding-tenders/opportunities/docs/2021-2027/common/guidance/aga_en.pdf' },
+    { icon: '🤝', label: 'Partner Search', url: `https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/partner-search;freeTextSearchKeyword=${encodeURIComponent(cid)}` },
+    { icon: '❓', label: 'FAQ & IT Support', url: 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/support/faq' },
+    { icon: '📧', label: 'National Contact Points (NCPs)', url: 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/support/ncp' },
   ];
+}
+
+/* ── Work Packages extraction ─────────────────────────── */
+function extractWorkPackages(scope) {
+  if (!scope) return [];
+  const wps = [];
+  for (const m of scope.matchAll(/\bWP\s*(\d+)\s*[:\-–]\s*([^\n;.]{8,80})/gi)) {
+    wps.push({ num: 'WP' + m[1], label: m[2].trim() });
+  }
+  if (wps.length) return wps;
+  for (const m of scope.matchAll(/Work\s+Package\s+(\d+)\s*[:\-–]\s*([^\n;.]{8,80})/gi)) {
+    wps.push({ num: 'WP' + m[1], label: m[2].trim() });
+  }
+  return wps;
+}
+
+/* ── Key Deliverables extraction ─────────────────────── */
+function extractDeliverables(scope) {
+  if (!scope) return [];
+  const delivs = [];
+  for (const m of scope.matchAll(/\bD[.\-]?(\d+)\s*[:\-–]\s*([^\n;.]{8,80})/g)) {
+    delivs.push({ num: 'D' + m[1], label: m[2].trim() });
+  }
+  if (delivs.length) return delivs;
+  for (const m of scope.matchAll(/Deliverable\s+(\d+)\s*[:\-–]\s*([^\n;.]{8,80})/gi)) {
+    delivs.push({ num: 'D' + m[1], label: m[2].trim() });
+  }
+  return delivs;
 }
 
 function formatDeadline(d, status) {
@@ -1199,29 +1253,39 @@ function renderDetail(call) {
   const criteria = getEvaluationCriteria(call);
   const timeline = getTimeline(call);
   const docLinks = getDocLinks(call);
-  const outcomes = extractExpectedOutcomes(call.scope);
+  const outcomes = extractExpectedOutcomes(call.scope, 0);   // no cap — full list
   const keywords = extractKeywords(call.scope);
+  const wps      = extractWorkPackages(call.scope);
+  const delivs   = extractDeliverables(call.scope);
 
+  /* ── helper: bar color (green ≥30%, amber <30%) ─── */
+  const barBg = pct => pct >= 30
+    ? 'linear-gradient(90deg,var(--green),#6ee7b7)'
+    : 'linear-gradient(90deg,var(--amber),#fcd34d)';
+
+  /* ── Expected Outcomes ─── */
   const outcomesHTML = outcomes.length
     ? `<ul class="outcomes-list">${outcomes.map(o => `<li>${o}</li>`).join('')}</ul>`
     : `<p style="color:var(--text-muted);font-size:.88rem">Expected outcomes available in official document.</p>`;
 
+  /* ── Keywords / Research Areas ─── */
   const kwHTML = keywords.length
     ? `<div class="keyword-chips">${keywords.map(k => `<span class="kw-chip">${k}</span>`).join('')}</div>`
     : `<p style="color:var(--text-muted);font-size:.88rem">See official call for research areas.</p>`;
 
-  const tlHTML = timeline.map((t, i) => `
-    <div class="tl-item">
-      <div class="tl-dot-wrap">
-        <div class="tl-dot ${t.muted ? 'muted' : ''}"></div>
-        ${i < timeline.length - 1 ? '<div class="tl-line"></div>' : ''}
+  /* ── Horizontal Timeline ─── */
+  const tlHTML = `<div class="tl-h">${timeline.map((t, i) => `
+    <div class="tl-h-step">
+      <div class="tl-h-track">
+        <div class="tl-h-line${i === 0 ? ' edge' : ''}"></div>
+        <div class="tl-h-dot ${t.muted ? 'muted' : 'active'}"></div>
+        <div class="tl-h-line${i === timeline.length - 1 ? ' edge' : ''}"></div>
       </div>
-      <div style="padding-bottom:2px">
-        <div class="tl-label">${t.label}</div>
-        <div class="tl-date">${t.date}</div>
-      </div>
-    </div>`).join('');
+      <div class="tl-h-label">${t.label}</div>
+      <div class="tl-h-date">${t.date}</div>
+    </div>`).join('')}</div>`;
 
+  /* ── Document Links ─── */
   const dlHTML = docLinks.map(d =>
     `<a class="doc-link" href="${d.url}" target="_blank" rel="noopener">
       <span style="font-size:1.1rem">${d.icon}</span>
@@ -1229,24 +1293,33 @@ function renderDetail(call) {
       <span style="color:var(--accent);font-size:.8rem">↗</span>
     </a>`).join('');
 
+  /* ── Evaluation Criteria (color-coded bars) ─── */
   const critRows = criteria.excellence > 0 ? `
     <div class="criteria-item">
       <span class="criteria-name">Excellence</span>
-      <div class="criteria-bar-wrap"><div class="criteria-bar" style="width:${criteria.excellence}%"></div></div>
+      <div class="criteria-bar-wrap"><div class="criteria-bar" style="width:${criteria.excellence}%;background:${barBg(criteria.excellence)}"></div></div>
       <span class="criteria-pct">${criteria.excellence}%</span>
     </div>
-    ${criteria.impact > 0 ? `
-    <div class="criteria-item">
+    ${criteria.impact > 0 ? `<div class="criteria-item">
       <span class="criteria-name">Impact</span>
-      <div class="criteria-bar-wrap"><div class="criteria-bar" style="width:${criteria.impact}%;background:linear-gradient(90deg,var(--violet),#c4b5fd)"></div></div>
+      <div class="criteria-bar-wrap"><div class="criteria-bar" style="width:${criteria.impact}%;background:${barBg(criteria.impact)}"></div></div>
       <span class="criteria-pct">${criteria.impact}%</span>
     </div>` : ''}
-    ${criteria.implementation > 0 ? `
-    <div class="criteria-item">
+    ${criteria.implementation > 0 ? `<div class="criteria-item">
       <span class="criteria-name">Implementation</span>
-      <div class="criteria-bar-wrap"><div class="criteria-bar" style="width:${criteria.implementation}%;background:linear-gradient(90deg,var(--green),#6ee7b7)"></div></div>
+      <div class="criteria-bar-wrap"><div class="criteria-bar" style="width:${criteria.implementation}%;background:${barBg(criteria.implementation)}"></div></div>
       <span class="criteria-pct">${criteria.implementation}%</span>
     </div>` : ''}` : '';
+
+  /* ── Work Packages ─── */
+  const wpHTML = wps.length
+    ? `<div class="wp-list">${wps.map(w => `<div class="wp-item"><span class="wp-num">${w.num}</span><span class="wp-label">${w.label}</span></div>`).join('')}</div>`
+    : `<p style="color:var(--text-muted);font-size:.88rem">Work package structure not specified in call text.</p>`;
+
+  /* ── Key Deliverables ─── */
+  const delivHTML = delivs.length
+    ? `<div class="deliv-list">${delivs.map(d => `<div class="deliv-item"><span class="deliv-num">${d.num}</span><span class="deliv-label">${d.label}</span></div>`).join('')}</div>`
+    : `<p style="color:var(--text-muted);font-size:.88rem">Key deliverables not specified in call text.</p>`;
 
   detailBody.innerHTML = `
     <header class="detail-header">
@@ -1268,11 +1341,11 @@ function renderDetail(call) {
         </div>
       </div>
 
-      <!-- QUICK REFERENCE -->
+      <!-- 1. QUICK REFERENCE -->
       <div class="detail-section">
         <h2>Quick Reference</h2>
         <div class="detail-grid">
-          <div class="detail-grid-cell"><div class="detail-grid-label">ID</div>
+          <div class="detail-grid-cell"><div class="detail-grid-label">Call ID</div>
             <div class="detail-grid-value" style="font-family:var(--mono);font-size:.75rem;word-break:break-all">${call.id}</div></div>
           <div class="detail-grid-cell"><div class="detail-grid-label">Status</div>
             <div class="detail-grid-value">${call.status || 'N/A'}</div></div>
@@ -1294,56 +1367,69 @@ function renderDetail(call) {
       <!-- PORTAL BANNER -->
       <div class="detail-portal-banner">
         <a class="detail-portal-link" href="${portalUrl(call.id)}" target="_blank" rel="noopener">
-          📄 View Official Document on Horizon Portal ↗
+          🔗 View Official Call on Horizon Portal ↗
         </a>
       </div>
 
-      <!-- FULL SCOPE -->
+      <!-- 2. FULL SCOPE (complete, scrollable) -->
       <div class="detail-section">
         <h2>Full Scope</h2>
         <div class="detail-scope">${call.scope || 'No scope text available. Visit the Horizon Portal for the full call document.'}</div>
       </div>
 
-      <!-- EXPECTED OUTCOMES -->
+      <!-- 3. EXPECTED OUTCOMES (complete list) -->
       <div class="detail-section">
         <h2>Expected Outcomes</h2>
         ${outcomesHTML}
       </div>
 
-      <!-- KEYWORDS -->
+      <!-- 5. RESEARCH AREAS & KEYWORDS -->
       <div class="detail-section">
-        <h2>Research Areas &amp; Keywords</h2>
+        <h2>Research Areas</h2>
         ${kwHTML}
       </div>
 
-      <!-- ELIGIBILITY -->
+      <!-- 4. EVALUATION CRITERIA (color-coded bars) -->
       <div class="detail-section">
-        <h2>Eligibility</h2>
+        <h2>Evaluation Criteria</h2>
+        <div class="criteria-list">${critRows || '<p style="color:var(--text-muted);font-size:.88rem">See official call document.</p>'}</div>
+        <p class="hint-text">Threshold: 3/5 per criterion (typical). Overall minimum ~70/100. Always verify in the official call document.</p>
+      </div>
+
+      <!-- 6. WORK PACKAGES -->
+      <div class="detail-section">
+        <h2>Work Packages</h2>
+        ${wpHTML}
+      </div>
+
+      <!-- 7. KEY DELIVERABLES -->
+      <div class="detail-section">
+        <h2>Key Deliverables</h2>
+        ${delivHTML}
+      </div>
+
+      <!-- 8. TIMELINE (horizontal visual) -->
+      <div class="detail-section">
+        <h2>Timeline</h2>
+        ${tlHTML}
+        <p class="hint-text">Estimated post-submission dates. Verify all dates on the Horizon Portal.</p>
+      </div>
+
+      <!-- 9. ELIGIBILITY (DETAILED) -->
+      <div class="detail-section">
+        <h2>Eligibility (Detailed)</h2>
         <div class="elig-rows">
           <div class="elig-row"><span class="elig-label">Countries</span><span class="elig-value">${elig.countries}</span></div>
           <div class="elig-row"><span class="elig-label">Org. Types</span><span class="elig-value">${elig.types}</span></div>
           <div class="elig-row"><span class="elig-label">Consortium</span><span class="elig-value">${elig.consortium}</span></div>
-          <div class="elig-row"><span class="elig-label">Restrictions</span><span class="elig-value">See official call document</span></div>
+          <div class="elig-row"><span class="elig-label">Roles</span><span class="elig-value">Coordinator + Partners (check call for restrictions)</span></div>
+          <div class="elig-row"><span class="elig-label">Restrictions</span><span class="elig-value">See official call document for country-specific conditions</span></div>
         </div>
       </div>
 
-      <!-- EVALUATION CRITERIA -->
+      <!-- 10. DOCUMENTS & RESOURCES -->
       <div class="detail-section">
-        <h2>Evaluation Criteria</h2>
-        <div class="criteria-list">${critRows || '<p style="color:var(--text-muted);font-size:.88rem">See official call document.</p>'}</div>
-        <p class="hint-text">Typical thresholds: 70/100 per criterion, 70/100 overall. Always verify in the official call document.</p>
-      </div>
-
-      <!-- TIMELINE -->
-      <div class="detail-section">
-        <h2>Timeline</h2>
-        <div class="timeline-list">${tlHTML}</div>
-        <p class="hint-text">Estimated dates based on submission deadline. Verify all dates in the official call on Horizon Portal.</p>
-      </div>
-
-      <!-- DOCUMENTS & LINKS -->
-      <div class="detail-section">
-        <h2>Documents &amp; Links</h2>
+        <h2>Documents &amp; Resources</h2>
         <div class="doc-links">${dlHTML}</div>
       </div>
 
@@ -1352,7 +1438,7 @@ function renderDetail(call) {
     <footer class="detail-footer">
       <button class="detail-back" id="detail-back-bottom">← Back to results</button>
       <div style="display:flex;align-items:center;gap:10px">
-        <a class="btn-portal" href="${portalUrl(call.id)}" target="_blank" rel="noopener" style="font-size:.82rem">📄 Portal ↗</a>
+        <a class="btn-portal" href="${portalUrl(call.id)}" target="_blank" rel="noopener" style="font-size:.82rem">🔗 Portal ↗</a>
         ${scoreRingHTML(call.score, m, false)}
       </div>
     </footer>
