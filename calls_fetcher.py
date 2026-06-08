@@ -4,7 +4,15 @@ The portal front-end is an Angular SPA, but it is powered by the public SEDIA
 search API. This module queries that API directly and normalizes each result
 into the same field schema used by calls.txt / matcher.py:
 
-    ID, TÍTULO, CLUSTER, ESTADO, DEADLINE, BUDGET, SCOPE
+    ID, TÍTULO, CLUSTER, ESTADO, DEADLINE, BUDGET, SCOPE,
+    DESCRIPTION_FULL, BUDGET_OVERVIEW, CONDITIONS, TAGS, OPENING_DATE
+
+The SEDIA API returns rich metadata in every result:
+  - descriptionByte  → full HTML with Expected Outcomes + Scope sections
+  - budgetOverview   → JSON with expectedGrants, minContribution, maxContribution
+  - topicConditions  → eligibility conditions HTML
+  - tags             → curated keyword tags
+  - startDate        → planned opening date
 
 Usage:
     from calls_fetcher import fetch_calls
@@ -112,17 +120,36 @@ def fetch_calls(
             status_code = _first(md, "status")
             budget = _first(md, "budget")
             currency = _first(md, "currency")
-            # The search summary is just the topic title; the real topical
-            # signal lives in the destination fields. Combine them for SCOPE.
-            scope = " ".join(
-                _strip_html(part)
-                for part in (
-                    res.get("summary", ""),
-                    _first(md, "destinationDescription"),
-                    _first(md, "destinationDetails"),
-                )
-                if part
-            ).strip()
+
+            # descriptionByte is the richest scope source: full HTML with
+            # "Expected Outcome:" and "Scope:" sections.  Fall back to the
+            # old destination fields when it is absent.
+            description_html = _first(md, "descriptionByte")
+            if description_html:
+                scope = _strip_html(description_html)
+            else:
+                scope = " ".join(
+                    _strip_html(part)
+                    for part in (
+                        res.get("summary", ""),
+                        _first(md, "destinationDescription"),
+                        _first(md, "destinationDetails"),
+                    )
+                    if part
+                ).strip()
+
+            # budgetOverview: raw JSON string with per-action budget details
+            budget_overview = _first(md, "budgetOverview")
+
+            # topicConditions: eligibility + general conditions HTML
+            conditions_html = _first(md, "topicConditions")
+
+            # tags: curated keyword list (already plain strings)
+            tags = md.get("tags", [])
+
+            # startDate: planned opening date
+            opening_date = _format_deadline(_first(md, "startDate"))
+
             calls.append(
                 {
                     "ID": _first(md, "identifier") or res.get("reference", "?"),
@@ -134,6 +161,12 @@ def fetch_calls(
                     "ACTION": _first(md, "typesOfAction"),
                     "SCOPE": scope,
                     "URL": res.get("url", ""),
+                    # Rich fields from SEDIA metadata
+                    "DESCRIPTION_HTML": description_html,
+                    "BUDGET_OVERVIEW": budget_overview,
+                    "CONDITIONS_HTML": conditions_html,
+                    "TAGS": tags,
+                    "OPENING_DATE": opening_date,
                 }
             )
             if len(calls) >= max_results:

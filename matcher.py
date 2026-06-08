@@ -244,20 +244,27 @@ def _score_all_raw(
 
         # Build base result, then enrich with structured extraction
         base = {
-            "ID":           call.get("ID", "?"),
-            "TÍTULO":       call.get("TÍTULO", ""),
-            "ESTADO":       status,
-            "DEADLINE":     call.get("DEADLINE", ""),
-            "SCOPE":        call.get("SCOPE", ""),
-            "ACTION":       call.get("ACTION", ""),
-            "BUDGET":       call.get("BUDGET", ""),
-            "CLUSTER":      call.get("CLUSTER", ""),
+            "ID":               call.get("ID", "?"),
+            "TÍTULO":           call.get("TÍTULO", ""),
+            "ESTADO":           status,
+            "DEADLINE":         call.get("DEADLINE", ""),
+            "SCOPE":            call.get("SCOPE", ""),
+            "ACTION":           call.get("ACTION", ""),
+            "BUDGET":           call.get("BUDGET", ""),
+            "CLUSTER":          call.get("CLUSTER", ""),
+            "URL":              call.get("URL", ""),
+            # Rich SEDIA fields (present when index was built with new fetcher)
+            "DESCRIPTION_HTML": call.get("DESCRIPTION_HTML", ""),
+            "BUDGET_OVERVIEW":  call.get("BUDGET_OVERVIEW", ""),
+            "CONDITIONS_HTML":  call.get("CONDITIONS_HTML", ""),
+            "TAGS":             call.get("TAGS", []),
+            "OPENING_DATE":     call.get("OPENING_DATE", ""),
             # Pass through computed fields for enrichment
-            "score":        score,
-            "status":       status,
-            "deadline":     call.get("DEADLINE", ""),
-            "sector_match": sector_match,
-            "call_sector":  call_sector,
+            "score":            score,
+            "status":           status,
+            "deadline":         call.get("DEADLINE", ""),
+            "sector_match":     sector_match,
+            "call_sector":      call_sector,
         }
         enriched = enrich_call(base)
         scored.append(enriched)
