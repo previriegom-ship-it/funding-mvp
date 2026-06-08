@@ -723,6 +723,7 @@ function truncate(text, max) {
 }
 
 function escAttr(s) { return (s||'').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+function escHtml(s)  { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 /* ── Project type ─────────────────────────────────────── */
 function getProjectTypeCode(call) {
@@ -1267,14 +1268,24 @@ function renderDetail(call) {
     ? 'linear-gradient(90deg,var(--green),#6ee7b7)'
     : 'linear-gradient(90deg,var(--amber),#fcd34d)';
 
+  // Safe escaped values for raw text injected into innerHTML
+  const safeScope  = escHtml(call.scope || '');
+  const safeTitle  = escHtml(call.title || '');
+  const safeId     = escHtml(call.id || '');
+
+  console.log('[RFI] renderDetail — call.id:', call.id);
+  console.log('[RFI] scope length:', (call.scope||'').length, 'chars');
+  console.log('[RFI] outcomes:', outcomes.length, '| keywords:', keywords.length,
+              '| wps:', wps.length, '| delivs:', delivs.length);
+
   /* ── Expected Outcomes ─── */
   const outcomesHTML = outcomes.length
-    ? `<ul class="outcomes-list">${outcomes.map(o => `<li>${o}</li>`).join('')}</ul>`
+    ? `<ul class="outcomes-list">${outcomes.map(o => `<li>${escHtml(o)}</li>`).join('')}</ul>`
     : `<p style="color:var(--text-muted);font-size:.88rem">Expected outcomes available in official document.</p>`;
 
   /* ── Keywords / Research Areas ─── */
   const kwHTML = keywords.length
-    ? `<div class="keyword-chips">${keywords.map(k => `<span class="kw-chip">${k}</span>`).join('')}</div>`
+    ? `<div class="keyword-chips">${keywords.map(k => `<span class="kw-chip">${escHtml(k)}</span>`).join('')}</div>`
     : `<p style="color:var(--text-muted);font-size:.88rem">See official call for research areas.</p>`;
 
   /* ── Horizontal Timeline ─── */
@@ -1325,101 +1336,112 @@ function renderDetail(call) {
     ? `<div class="deliv-list">${delivs.map(d => `<div class="deliv-item"><span class="deliv-num">${d.num}</span><span class="deliv-label">${d.label}</span></div>`).join('')}</div>`
     : `<p style="color:var(--text-muted);font-size:.88rem">Key deliverables not specified in call text.</p>`;
 
+  // Build HTML string in parts so any individual failure is visible
+  const heroSection = `
+    <div class="detail-hero" style="border-left-color:${bc}">
+      <span class="card-id">${safeId}</span>
+      <h1>${safeTitle}</h1>
+      <div class="detail-score-row">
+        ${scoreRingHTML(call.score, m, true)}
+        ${statusBadge(call.status)}
+        ${matchBadge(m)}
+        ${call.deadline ? `<span class="badge badge-deadline">📅 ${call.deadline}</span>` : ''}
+      </div>
+    </div>`;
+
+  const quickRefSection = `
+    <div class="detail-section">
+      <h2>Quick Reference</h2>
+      <div class="detail-grid">
+        <div class="detail-grid-cell"><div class="detail-grid-label">Call ID</div>
+          <div class="detail-grid-value" style="font-family:var(--mono);font-size:.75rem;word-break:break-all">${safeId}</div></div>
+        <div class="detail-grid-cell"><div class="detail-grid-label">Status</div>
+          <div class="detail-grid-value">${call.status || 'N/A'}</div></div>
+        <div class="detail-grid-cell"><div class="detail-grid-label">Deadline</div>
+          <div class="detail-grid-value">${call.deadline || 'See portal'}</div></div>
+        <div class="detail-grid-cell"><div class="detail-grid-label">Project Type</div>
+          <div class="detail-grid-value">${ptype}</div></div>
+        <div class="detail-grid-cell"><div class="detail-grid-label">Sector</div>
+          <div class="detail-grid-value">${si.icon} ${si.label}</div></div>
+        <div class="detail-grid-cell"><div class="detail-grid-label">Match Score</div>
+          <div class="detail-grid-value">${(call.score||0).toFixed(3)} — ${m}</div></div>
+        <div class="detail-grid-cell"><div class="detail-grid-label">Budget</div>
+          <div class="detail-grid-value">${formatBudget(call)}</div></div>
+        <div class="detail-grid-cell"><div class="detail-grid-label">Countries</div>
+          <div class="detail-grid-value">${elig.countries}</div></div>
+      </div>
+    </div>`;
+
+  const scopeSection = `
+    <div class="detail-section">
+      <h2>Full Scope</h2>
+      <div class="detail-scope">${safeScope || 'No scope text available. Visit the Horizon Portal for the full call document.'}</div>
+    </div>`;
+
+  console.log('[RFI] Building section HTML…');
+  console.log('[RFI] ✓ heroSection:', heroSection.length, 'chars');
+  console.log('[RFI] ✓ quickRefSection:', quickRefSection.length, 'chars');
+  console.log('[RFI] ✓ scopeSection:', scopeSection.length, 'chars');
+  console.log('[RFI] ✓ outcomesHTML:', outcomesHTML.length, 'chars');
+  console.log('[RFI] ✓ kwHTML:', kwHTML.length, 'chars');
+  console.log('[RFI] ✓ critRows:', critRows.length, 'chars');
+  console.log('[RFI] ✓ wpHTML:', wpHTML.length, 'chars');
+  console.log('[RFI] ✓ delivHTML:', delivHTML.length, 'chars');
+  console.log('[RFI] ✓ tlHTML:', tlHTML.length, 'chars');
+  console.log('[RFI] ✓ dlHTML:', dlHTML.length, 'chars');
+
   detailBody.innerHTML = `
-    <header class="detail-header">
+    <div class="detail-header">
       <button class="detail-back" id="detail-back-top">← Back</button>
-      <span class="detail-header-id">${call.id}</span>
-    </header>
+      <span class="detail-header-id">${safeId}</span>
+    </div>
 
     <div class="detail-body">
 
-      <!-- HERO -->
-      <div class="detail-hero" style="border-left-color:${bc}">
-        <span class="card-id">${call.id}</span>
-        <h1>${call.title || ''}</h1>
-        <div class="detail-score-row">
-          ${scoreRingHTML(call.score, m, true)}
-          ${statusBadge(call.status)}
-          ${matchBadge(m)}
-          ${call.deadline ? `<span class="badge badge-deadline">📅 ${call.deadline}</span>` : ''}
-        </div>
-      </div>
+      ${heroSection}
 
-      <!-- 1. QUICK REFERENCE -->
-      <div class="detail-section">
-        <h2>Quick Reference</h2>
-        <div class="detail-grid">
-          <div class="detail-grid-cell"><div class="detail-grid-label">Call ID</div>
-            <div class="detail-grid-value" style="font-family:var(--mono);font-size:.75rem;word-break:break-all">${call.id}</div></div>
-          <div class="detail-grid-cell"><div class="detail-grid-label">Status</div>
-            <div class="detail-grid-value">${call.status || 'N/A'}</div></div>
-          <div class="detail-grid-cell"><div class="detail-grid-label">Deadline</div>
-            <div class="detail-grid-value">${call.deadline || 'See portal'}</div></div>
-          <div class="detail-grid-cell"><div class="detail-grid-label">Project Type</div>
-            <div class="detail-grid-value">${ptype}</div></div>
-          <div class="detail-grid-cell"><div class="detail-grid-label">Sector</div>
-            <div class="detail-grid-value">${si.icon} ${si.label}</div></div>
-          <div class="detail-grid-cell"><div class="detail-grid-label">Match Score</div>
-            <div class="detail-grid-value">${(call.score||0).toFixed(3)} — ${m}</div></div>
-          <div class="detail-grid-cell"><div class="detail-grid-label">Budget</div>
-            <div class="detail-grid-value">${formatBudget(call)}</div></div>
-          <div class="detail-grid-cell"><div class="detail-grid-label">Countries</div>
-            <div class="detail-grid-value">${elig.countries}</div></div>
-        </div>
-      </div>
+      ${quickRefSection}
 
-      <!-- PORTAL BANNER -->
       <div class="detail-portal-banner">
         <a class="detail-portal-link" href="${portalUrl(call.id)}" target="_blank" rel="noopener">
           🔗 View Official Call on Horizon Portal ↗
         </a>
       </div>
 
-      <!-- 2. FULL SCOPE (complete, scrollable) -->
-      <div class="detail-section">
-        <h2>Full Scope</h2>
-        <div class="detail-scope">${call.scope || 'No scope text available. Visit the Horizon Portal for the full call document.'}</div>
-      </div>
+      ${scopeSection}
 
-      <!-- 3. EXPECTED OUTCOMES (complete list) -->
       <div class="detail-section">
         <h2>Expected Outcomes</h2>
         ${outcomesHTML}
       </div>
 
-      <!-- 5. RESEARCH AREAS & KEYWORDS -->
       <div class="detail-section">
         <h2>Research Areas</h2>
         ${kwHTML}
       </div>
 
-      <!-- 4. EVALUATION CRITERIA (color-coded bars) -->
       <div class="detail-section">
         <h2>Evaluation Criteria</h2>
         <div class="criteria-list">${critRows || '<p style="color:var(--text-muted);font-size:.88rem">See official call document.</p>'}</div>
         <p class="hint-text">Threshold: 3/5 per criterion (typical). Overall minimum ~70/100. Always verify in the official call document.</p>
       </div>
 
-      <!-- 6. WORK PACKAGES -->
       <div class="detail-section">
         <h2>Work Packages</h2>
         ${wpHTML}
       </div>
 
-      <!-- 7. KEY DELIVERABLES -->
       <div class="detail-section">
         <h2>Key Deliverables</h2>
         ${delivHTML}
       </div>
 
-      <!-- 8. TIMELINE (horizontal visual) -->
       <div class="detail-section">
         <h2>Timeline</h2>
         ${tlHTML}
         <p class="hint-text">Estimated post-submission dates. Verify all dates on the Horizon Portal.</p>
       </div>
 
-      <!-- 9. ELIGIBILITY (DETAILED) -->
       <div class="detail-section">
         <h2>Eligibility (Detailed)</h2>
         <div class="elig-rows">
@@ -1431,7 +1453,6 @@ function renderDetail(call) {
         </div>
       </div>
 
-      <!-- 10. DOCUMENTS & RESOURCES -->
       <div class="detail-section">
         <h2>Documents &amp; Resources</h2>
         <div class="doc-links">${dlHTML}</div>
@@ -1439,14 +1460,16 @@ function renderDetail(call) {
 
     </div>
 
-    <footer class="detail-footer">
+    <div class="detail-footer">
       <button class="detail-back" id="detail-back-bottom">← Back to results</button>
       <div style="display:flex;align-items:center;gap:10px">
         <a class="btn-portal" href="${portalUrl(call.id)}" target="_blank" rel="noopener" style="font-size:.82rem">🔗 Portal ↗</a>
         ${scoreRingHTML(call.score, m, false)}
       </div>
-    </footer>
+    </div>
   `;
+
+  console.log('[RFI] ✅ detailBody.innerHTML set —', detailBody.children.length, 'top-level children');
 
   $('detail-back-top').addEventListener('click', closeDetail);
   $('detail-back-bottom').addEventListener('click', closeDetail);
