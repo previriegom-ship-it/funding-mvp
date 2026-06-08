@@ -572,7 +572,7 @@ a:hover{text-decoration:underline}
   <p class="subtitle">Paste your research group URL and discover the best Horizon Europe opportunities matched to your profile</p>
   <div class="input-row">
     <input id="url-input" type="url" placeholder="https://your-research-group.eu/" autocomplete="url" spellcheck="false">
-    <button id="analyze-btn">Analyze&ensp;→</button>
+    <button id="analyze-btn" onclick="handleAnalyze()">Analyze&ensp;→</button>
   </div>
   <span class="example-link" id="example-link">Try: https://ging.github.io/</span>
 </section>
@@ -1518,6 +1518,7 @@ function switchTab(tab) {
    EVENT HANDLERS
    ═══════════════════════════════════════════════════════════ */
 async function handleAnalyze() {
+  console.log('[RFI] handleAnalyze() called');
   const url = urlInput.value.trim();
   if (!url) { urlInput.focus(); return; }
   if (!/^https?:\/\/.+/i.test(url)) { showError('Invalid URL. Please enter a valid URL starting with http:// or https://'); return; }
@@ -1553,47 +1554,59 @@ async function handleAnalyze() {
 /* ═══════════════════════════════════════════════════════════
    INIT
    ═══════════════════════════════════════════════════════════ */
-// Analyze button
-analyzeBtn.addEventListener('click', handleAnalyze);
+try {
+  console.log('[RFI] Script loaded OK — attaching event listeners');
 
-// Enter key
-urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleAnalyze(); });
+  // Analyze button
+  analyzeBtn.addEventListener('click', handleAnalyze);
 
-// Example link
-$('example-link').addEventListener('click', () => { urlInput.value = 'https://ging.github.io/'; urlInput.focus(); });
+  // Enter key
+  urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleAnalyze(); });
 
-// Tab clicks
-$('tab-bar').addEventListener('click', e => {
-  const btn = e.target.closest('.tab-btn');
-  if (btn && btn.dataset.tab) switchTab(btn.dataset.tab);
-});
+  // Example link
+  $('example-link').addEventListener('click', () => { urlInput.value = 'https://ging.github.io/'; urlInput.focus(); });
 
-// Card clicks (event delegation on results)
-resultsCtn.addEventListener('click', e => {
-  const card = e.target.closest('[data-call-id]');
-  if (!card) return;
-  // Don't open panel if clicking portal link
-  if (e.target.closest('.btn-portal')) return;
-  const call = state.allCalls[card.dataset.callId];
-  if (call) openPanel(call);
-});
+  // Tab clicks
+  $('tab-bar').addEventListener('click', e => {
+    const btn = e.target.closest('.tab-btn');
+    if (btn && btn.dataset.tab) switchTab(btn.dataset.tab);
+  });
 
-// Overlay click closes panel
-overlay.addEventListener('click', closePanel);
+  // Card clicks (event delegation on results)
+  resultsCtn.addEventListener('click', e => {
+    const card = e.target.closest('[data-call-id]');
+    if (!card) return;
+    // Don't open panel if clicking portal link
+    if (e.target.closest('.btn-portal')) return;
+    const call = state.allCalls[card.dataset.callId];
+    if (call) openPanel(call);
+  });
 
-// Escape key
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    if (state.detailCall) closeDetail();
-    else if (state.selectedCall) closePanel();
-  }
-});
+  // Overlay click closes panel
+  overlay.addEventListener('click', closePanel);
 
-// URL param auto-analyze
-(function autoStart() {
-  const u = new URLSearchParams(window.location.search).get('url');
-  if (u) { urlInput.value = u; handleAnalyze(); }
-})();
+  // Escape key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (state.detailCall) closeDetail();
+      else if (state.selectedCall) closePanel();
+    }
+  });
+
+  // URL param auto-analyze
+  (function autoStart() {
+    const u = new URLSearchParams(window.location.search).get('url');
+    if (u) { urlInput.value = u; handleAnalyze(); }
+  })();
+
+  console.log('[RFI] All listeners attached. API_BASE =', API_BASE);
+} catch (initErr) {
+  console.error('[RFI] INIT ERROR — this is why the button does not work:', initErr);
+  document.body.insertAdjacentHTML('afterbegin',
+    `<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#ef4444;color:#fff;padding:12px 20px;font-family:monospace;font-size:.85rem">
+      ⚠️ JS Init Error: ${initErr.message} — open DevTools Console for details
+    </div>`);
+}
 </script>
 </body>
 </html>
