@@ -583,8 +583,16 @@ def extract_eligibility(call: dict) -> dict:
         org_types.append("NGOs")
     if "hospital" in combined or "clinical" in combined:
         org_types.append("Healthcare providers")
-    if not org_types:
-        org_types = ["Universities", "Research Organizations", "SMEs", "Industry"]
+    # Horizon Europe standard: all call types are open to universities,
+    # research orgs and industry unless specifically restricted.
+    # Ensure universities and research orgs are always included.
+    if "Universities" not in org_types:
+        org_types.insert(0, "Universities")
+    if "Research Organizations" not in org_types:
+        org_types.insert(1, "Research Organizations")
+    if not any(t in org_types for t in ("SMEs", "Industry")):
+        org_types.append("SMEs")
+        org_types.append("Industry")
 
     # Consortium — check combined text
     if "individual" in combined or "solo" in combined or "single applicant" in combined:
