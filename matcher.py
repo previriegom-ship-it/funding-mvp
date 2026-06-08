@@ -250,6 +250,8 @@ def _score_all_raw(
             "sector_match": sector_match,
             "call_sector":  call_sector,
             "scope":        call.get("SCOPE", ""),
+            "action":       call.get("ACTION", ""),
+            "budget":       call.get("BUDGET", ""),
         })
 
     if closed_count:
