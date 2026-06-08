@@ -947,6 +947,7 @@ async function analyzeGroup(url) {
   }, 6000);
 
   try {
+    console.log('[RFI] POST →', `${API_BASE}/analyze`, { url, detail_level: 'full' });
     const res = await fetch(`${API_BASE}/analyze`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -955,11 +956,14 @@ async function analyzeGroup(url) {
     });
     clearTimeout(timer);
     clearInterval(msgTimer);
+    console.log('[RFI] Response status:', res.status, res.statusText);
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
       throw new Error(body.detail || `Server error (${res.status})`);
     }
-    return await res.json();
+    const json = await res.json();
+    console.log('[RFI] Response JSON top-level keys:', Object.keys(json));
+    return json;
   } catch (err) {
     clearTimeout(timer);
     clearInterval(msgTimer);
@@ -1527,24 +1531,49 @@ async function handleAnalyze() {
   showLoading();
 
   try {
+    console.log('[RFI] Fetching:', `${API_BASE}/analyze`, 'for URL:', url);
     const data = await analyzeGroup(url);
-    state.profile = data.profile;
-    state.opportunities = data.opportunities;
+
+    console.log('[RFI] Raw data received:', data);
+    console.log('[RFI] data.profile:', data?.profile);
+    console.log('[RFI] data.opportunities keys:', data?.opportunities ? Object.keys(data.opportunities) : 'MISSING');
+    console.log('[RFI] top_10_general count:', data?.opportunities?.top_10_general?.length ?? 'MISSING');
+    console.log('[RFI] all_ranked count:', data?.opportunities?.all_ranked?.length ?? 'MISSING');
+
+    if (!data || (!data.profile && !data.opportunities)) {
+      console.error('[RFI] API response has unexpected shape:', data);
+      throw new Error('API returned unexpected data shape. Check Console for details.');
+    }
+
+    state.profile      = data.profile      || data;          // fallback if top-level
+    state.opportunities = data.opportunities || data;
+
+    // Expose to window for console debugging
+    window._rfiState = state;
+    window.opportunitiesData = state.opportunities;
+
+    console.log('[RFI] state.profile:', state.profile?.name);
+    console.log('[RFI] state.opportunities:', state.opportunities);
 
     // Build lookup
     state.allCalls = {};
     const allRanked = state.opportunities?.all_ranked || [];
     for (const c of allRanked) { state.allCalls[c.id] = c; }
-    // Also index top_10 and by_sector calls (in case they have extra data)
-    for (const c of (state.opportunities?.top_10_general || [])) { if (!state.allCalls[c.id]) state.allCalls[c.id] = c; }
+    for (const c of (state.opportunities?.top_10_general || [])) {
+      if (!state.allCalls[c.id]) state.allCalls[c.id] = c;
+    }
+    console.log('[RFI] allCalls indexed:', Object.keys(state.allCalls).length, 'calls');
 
+    console.log('[RFI] Calling render functions…');
     renderProfile();
     renderTop10();
     renderBySector();
     renderFullList();
     switchTab('top10');
     showResults();
+    console.log('[RFI] ✅ Render complete');
   } catch (err) {
+    console.error('[RFI] ❌ Error in handleAnalyze:', err);
     showError(err.message || 'Something went wrong. Please try again.');
   } finally {
     analyzeBtn.disabled = false;
