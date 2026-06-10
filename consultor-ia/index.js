@@ -16,7 +16,10 @@ if (!API_KEY) {
   process.exit(1);
 }
 
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || "http://localhost:3000")
+const allowedOrigins = (
+  process.env.ALLOWED_ORIGINS ||
+  "http://localhost:3000,http://localhost:5500,http://127.0.0.1:5500,https://claude.ai"
+)
   .split(",")
   .map((o) => o.trim());
 
@@ -34,7 +37,7 @@ const app = express();
 
 app.use(express.json({ limit: "1mb" }));
 
-// CORS — only allow configured origins
+// CORS — allow configured origins + handle preflight correctly
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -42,13 +45,19 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error(`Origin not allowed: ${origin}`));
+        // Return false (not an Error) so the browser gets a proper 403, not a 500
+        callback(null, false);
       }
     },
-    methods: ["POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type"],
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: false,
+    optionsSuccessStatus: 204, // Some browsers (IE11) choke on 204 for preflight
   })
 );
+
+// Explicit OPTIONS handler for preflight — ensures 204 before rate limiter runs
+app.options("*", cors());
 
 // Rate limiting — 10 requests per minute per IP
 const limiter = rateLimit({
