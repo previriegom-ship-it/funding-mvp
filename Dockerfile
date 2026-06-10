@@ -2,10 +2,10 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY consultor-ia/package*.json ./
 RUN npm install
 
-COPY . .
+COPY consultor-ia/ .
 
 EXPOSE 3000
 
